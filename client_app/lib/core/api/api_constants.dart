@@ -1,0 +1,33 @@
+class ApiConstants {
+  static const String baseURL = 'http://ifix-pro.sy';
+  static const String login = '/api/v1/customer/login';
+  static const String register = 'api/register';
+  static const String logout = 'api/logout';
+  static const String privacyPolicy = 'api/privacy-policy';
+  static const String termsAndConditions = 'api/terms-conditions';
+  static const String contactUS = 'api/contact-us';
+  static const String forgotPassword = 'api/forgot-password';
+  static const String verifyResetPasswordOTPCode = 'api/verify-reset-code';
+  static const String resetPassword = 'api/reset-password';
+  static const String getUserProfile = 'api/profile';
+  static const String editUserProfilePassword = 'api/profile/password';
+  static const String getMyAccounts = 'api/my-accounts';
+  static const String setups = 'api/setup';
+  static const String openAccount = 'api/open-account';
+  static const String topupUrl = 'api/topup-url';
+  static const String withdrawUrl = 'api/withdraw-url';
+  static const String myTopups = 'api/my-topups';
+  static const String myWithdraws = 'api/my-withdraws';
+  static const String withdraw = 'api/withdraw';
+  static const String withdrawCurrencies = 'api/withdraw/currencies';
+  static const String withdrawNetworks = 'api/withdraw/networks';
+  static const String forexAccounts = 'api/forex-accounts';
+  static const String signals = 'api/signals';
+  static const String tradingStats = 'api/trading-stats';
+  static const String socialMedia = 'api/social-media';
+  static const String history = 'api/history';
+  static const String notifications = 'api/notifications';
+  static const String subscriptionPlans = 'api/subscription-plans';
+  static const String subscribeUrl = 'api/subscribe-url';
+  static const String appConfig = 'api/app-config';
+}
