@@ -1,8 +1,12 @@
-FROM php:8.2-cli
+# رفع إصدار PHP إلى 8.3 ليتوافق مع متطلبات مشروعك
+FROM php:8.3-cli
 
-# تثبيت الحزم الأساسية لعمل النظام وقواعد البيانات
-RUN apt-get update -y && apt-get install -y libmcrypt-dev unzip git libzip-dev
-RUN docker-php-ext-install pdo_mysql zip
+# تثبيت الحزم الأساسية وإضافة مكتبة libicu-dev المطلوبة لتشغيل intl
+RUN apt-get update -y && apt-get install -y libmcrypt-dev unzip git libzip-dev libicu-dev
+
+# تهيئة وتثبيت إضافات PHP المطلوبة (بما فيها intl)
+RUN docker-php-ext-configure intl
+RUN docker-php-ext-install pdo_mysql zip intl
 
 # تثبيت Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -13,7 +17,7 @@ WORKDIR /app
 # نسخ ملفات المشروع إلى السيرفر
 COPY . /app
 
-# تثبيت حزم لارافيل
+# تثبيت حزم لارافيل بنجاح بعد توفير المتطلبات
 RUN composer install --no-dev --optimize-autoloader
 
 # إعطاء الصلاحيات اللازمة لمجلدات التخزين
