@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ifix_client/core/helpers/extensions.dart';
 import '../../manager/wallet_cubit.dart';
@@ -15,18 +16,12 @@ class _TopUpDialogState extends State<TopUpDialog> {
   static const Color tertiaryColor = Color(0xFF8C3C3C);
   static const Color textColor = Color(0xFF3A302A);
 
-  final amountController = TextEditingController();
-  double selectedPreset = 100.0;
-
-  @override
-  void initState() {
-    super.initState();
-    amountController.text = '100';
-  }
+  final codeController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    amountController.dispose();
+    codeController.dispose();
     super.dispose();
   }
 
@@ -36,7 +31,7 @@ class _TopUpDialogState extends State<TopUpDialog> {
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('شحن رصيد المحفظة', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+        title: const Text('شحن رصيد ببطاقة', style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
         content: BlocConsumer<WalletCubit, WalletStates>(
           listener: (context, state) {
             if (state is TopUpSuccessState) {
@@ -48,77 +43,64 @@ class _TopUpDialogState extends State<TopUpDialog> {
           },
           builder: (context, state) {
             final isLoading = state is TopUpLoadingState;
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('اختر أو أدخل المبلغ المراد شحنه (ريال):', style: TextStyle(fontSize: 14, color: textColor)),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [50.0, 100.0, 200.0, 500.0].map((preset) {
-                    final isSel = selectedPreset == preset;
-                    return InkWell(
-                      onTap: () {
-                        setState(() {
-                          selectedPreset = preset;
-                          amountController.text = preset.toInt().toString();
-                        });
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isSel ? tertiaryColor : Colors.grey.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          preset.toInt().toString(),
-                          style: TextStyle(color: isSel ? Colors.white : textColor, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: amountController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'مبلغ الشحن',
-                    suffixText: 'ريال',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            return Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'قم بإدخال رقم بطاقة الشحن المكون من 14 رقماً:',
+                    style: TextStyle(fontSize: 14, color: textColor),
                   ),
-                  onChanged: (v) {
-                    final parsed = double.tryParse(v);
-                    if (parsed != null) {
-                      setState(() => selectedPreset = parsed);
-                    }
-                  },
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: tertiaryColor,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: codeController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(14),
+                    ],
+                    decoration: InputDecoration(
+                      labelText: 'رقم بطاقة الشحن',
+                      hintText: 'XXXXXXXXXXXXXX',
+                      prefixIcon: const Icon(Icons.credit_card, color: tertiaryColor),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: tertiaryColor, width: 2),
+                      ),
                     ),
-                    onPressed: isLoading
+                    validator: (v) {
+                      if (v == null || v.trim().length != 14) {
+                        return 'يجب إدخال 14 رقماً بالضبط';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: tertiaryColor,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: isLoading
                           ? null
                           : () {
-                              final amount = double.tryParse(amountController.text.trim()) ?? 0;
-                              if (amount > 0) {
-                                context.read<WalletCubit>().topUpWallet(amount);
+                              if (_formKey.currentState!.validate()) {
+                                context.read<WalletCubit>().topUpWallet(codeController.text.trim());
                               }
                             },
-                    child: isLoading
-                        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : const Text('إتمام الشحن الآن', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: isLoading
+                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          : const Text('شحن الرصيد الآن', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           },
         ),

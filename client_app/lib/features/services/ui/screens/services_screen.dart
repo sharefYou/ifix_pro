@@ -4,8 +4,8 @@ import 'package:ifix_client/core/helpers/extensions.dart';
 import '../../data/models/service_model.dart';
 import '../../manager/services_cubit.dart';
 import '../../manager/services_states.dart';
+import 'category_services_screen.dart';
 import 'search_screen.dart';
-import 'service_details_screen.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -36,7 +36,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
           backgroundColor: backgroundColor,
           elevation: 0,
           title: const Text(
-            'خدمات الصيانة المنزلية',
+            'أقسام الصيانة المنزلية',
             style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
           ),
           centerTitle: true,
@@ -71,15 +71,22 @@ class _ServicesScreenState extends State<ServicesScreen> {
                 ),
               );
             } else if (state is ServicesLoadedState) {
-              if (state.categories.isEmpty) {
-                return const Center(child: Text('لا توجد خدمات متاحة حالياً', style: TextStyle(color: textColor)));
+              final categories = state.categories;
+              if (categories.isEmpty) {
+                return const Center(child: Text('لا توجد أقسام متاحة حالياً', style: TextStyle(color: textColor)));
               }
-              return ListView.builder(
+              return GridView.builder(
                 padding: const EdgeInsets.all(16),
-                itemCount: state.categories.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.9,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: categories.length,
                 itemBuilder: (context, index) {
-                  final category = state.categories[index];
-                  return _buildCategorySection(category);
+                  final category = categories[index];
+                  return _buildCategoryCard(category);
                 },
               );
             }
@@ -90,42 +97,9 @@ class _ServicesScreenState extends State<ServicesScreen> {
     );
   }
 
-  Widget _buildCategorySection(ServiceCategoryModel category) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          category.name,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: textColor),
-        ),
-        if (category.description.isNotEmpty) ...[
-          const SizedBox(height: 4),
-          Text(category.description, style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.6))),
-        ],
-        const SizedBox(height: 12),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.85,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-          ),
-          itemCount: category.services.length,
-          itemBuilder: (context, sIdx) {
-            final service = category.services[sIdx];
-            return _buildServiceCard(service);
-          },
-        ),
-        const SizedBox(height: 24),
-      ],
-    );
-  }
-
-  Widget _buildServiceCard(ServiceModel service) {
+  Widget _buildCategoryCard(ServiceCategoryModel category) {
     return InkWell(
-      onTap: () => context.push(ServiceDetailsScreen(service: service)),
+      onTap: () => context.push(CategoryServicesScreen(category: category)),
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -134,7 +108,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: borderColor),
           boxShadow: [
-            BoxShadow(color: textColor.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(color: textColor.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 4)),
           ],
         ),
         child: Column(
@@ -146,19 +120,21 @@ class _ServicesScreenState extends State<ServicesScreen> {
                 color: tertiaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.home_repair_service, color: tertiaryColor, size: 30),
+              child: category.icon != null
+                  ? Image.network(category.icon!, width: 28, height: 28, errorBuilder: (_, __, ___) => const Icon(Icons.category_outlined, color: tertiaryColor, size: 28))
+                  : const Icon(Icons.category_outlined, color: tertiaryColor, size: 28),
             ),
             const Spacer(),
             Text(
-              service.name,
+              category.name,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
             Text(
-              '${service.price} ريال',
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: tertiaryColor),
+              '${category.services.length} خدمة صيانة',
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
             ),
           ],
         ),

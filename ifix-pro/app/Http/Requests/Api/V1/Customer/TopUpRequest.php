@@ -14,7 +14,7 @@ class TopUpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required', 'numeric', 'min:1'],
+            'code' => ['required', 'string', 'size:14'],
         ];
     }
 }

@@ -34,12 +34,12 @@ class WalletCubit extends Cubit<WalletStates> {
     }
   }
 
-  Future<void> topUpWallet(double amount) async {
+  Future<void> topUpWallet(String code) async {
     emit(TopUpLoadingState());
     try {
       final response = await DioHelper.postData(
         endPoint: ApiConstants.walletTopUp,
-        data: {'amount': amount},
+        data: {'code': code},
       );
       emit(TopUpSuccessState(response.data['message']?.toString() ?? 'تم الشحن بنجاح'));
       await fetchWalletData();

@@ -1,9 +1,21 @@
+String? _fixEmulatorUrl(String? url) {
+  if (url == null || url.trim().isEmpty) return null;
+  var fixed = url.trim();
+  if (fixed.contains('127.0.0.1')) {
+    fixed = fixed.replaceAll('127.0.0.1', '10.0.2.2');
+  } else if (fixed.contains('localhost')) {
+    fixed = fixed.replaceAll('localhost', '10.0.2.2');
+  }
+  return fixed;
+}
+
 class ServiceModel {
   final int id;
   final int categoryId;
   final String name;
   final String description;
   final double price;
+  final String? image;
 
   ServiceModel({
     required this.id,
@@ -11,6 +23,7 @@ class ServiceModel {
     required this.name,
     required this.description,
     required this.price,
+    this.image,
   });
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +33,7 @@ class ServiceModel {
       name: json['name']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
       price: json['price'] is num ? (json['price'] as num).toDouble() : double.tryParse(json['price'].toString()) ?? 0.0,
+      image: _fixEmulatorUrl(json['image']?.toString()),
     );
   }
 }
@@ -28,12 +42,14 @@ class ServiceCategoryModel {
   final int id;
   final String name;
   final String description;
+  final String? icon;
   final List<ServiceModel> services;
 
   ServiceCategoryModel({
     required this.id,
     required this.name,
     required this.description,
+    this.icon,
     required this.services,
   });
 
@@ -50,6 +66,7 @@ class ServiceCategoryModel {
       id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
+      icon: _fixEmulatorUrl(json['icon']?.toString()),
       services: servicesList,
     );
   }

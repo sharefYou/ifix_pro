@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Customer\TopUpRequest;
 use App\Http\Resources\Api\V1\Customer\WalletResource;
 use App\Http\Resources\Api\V1\Customer\WalletTransactionResource;
+use App\Models\RechargeCard;
 use App\Models\Wallet;
 use App\Models\WalletTransaction;
 use Illuminate\Http\JsonResponse;
@@ -38,10 +39,23 @@ class WalletController extends Controller
 
     public function topUp(TopUpRequest $request): JsonResponse
     {
-        // Simple mock of a top-up operation
-        $amount = (float) $request->amount;
+        $card = RechargeCard::where('code', $request->code)->first();
 
-        DB::transaction(function () use ($amount) {
+        if (!$card || $card->is_used || $card->expires_at < today()) {
+            return response()->json([
+                'message' => 'بطاقة الشحن غير صالحة أو مستخدمة من قبل أو منتهية الصلاحية.',
+            ], 422);
+        }
+
+        $amount = (float) $card->amount;
+
+        DB::transaction(function () use ($card, $amount) {
+            $card->update([
+                'is_used' => true,
+                'used_by_user_id' => auth()->id(),
+                'used_at' => now(),
+            ]);
+
             $wallet = Wallet::firstOrCreate(
                 ['user_id' => auth()->id()],
                 ['available_balance' => 0, 'held_balance' => 0]
@@ -60,7 +74,7 @@ class WalletController extends Controller
         });
 
         return response()->json([
-            'message' => 'Wallet topped up successfully.',
+            'message' => 'تم شحن المحفظة بقيمة ' . $amount . ' بنجاح.',
         ]);
     }
 }

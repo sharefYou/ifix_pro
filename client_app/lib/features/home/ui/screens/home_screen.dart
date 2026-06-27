@@ -10,8 +10,8 @@ import '../../../profile/ui/screens/profile_screen.dart';
 import '../../../services/data/models/service_model.dart';
 import '../../../services/manager/services_cubit.dart';
 import '../../../services/manager/services_states.dart';
+import '../../../services/ui/screens/category_services_screen.dart';
 import '../../../services/ui/screens/search_screen.dart';
-import '../../../services/ui/screens/service_details_screen.dart';
 import '../../../services/ui/screens/services_screen.dart';
 import '../../../wallet/manager/wallet_cubit.dart';
 import '../../../wallet/ui/screens/wallet_screen.dart';
@@ -158,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('الأقسام والخدمات', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor)),
+                const Text('أقسام الصيانة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor)),
                 TextButton(
                   onPressed: () => context.push(const ServicesScreen()),
                   child: const Text('عرض الكل', style: TextStyle(color: tertiaryColor, fontWeight: FontWeight.bold)),
@@ -179,31 +179,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(state.error, style: const TextStyle(color: Colors.red)),
                   );
                 } else if (state is ServicesLoadedState) {
-                  if (state.categories.isEmpty) {
+                  final categories = state.categories;
+                  if (categories.isEmpty) {
                     return Container(
                       padding: const EdgeInsets.all(24),
                       alignment: Alignment.center,
-                      child: const Text('لا توجد خدمات متاحة حالياً'),
+                      child: const Text('لا توجد أقسام متاحة حالياً'),
                     );
-                  }
-                  // Show all services combined or category grid
-                  final allServices = state.categories.expand((c) => c.services).toList();
-                  if (allServices.isEmpty) {
-                    return const Center(child: Text('لا توجد خدمات حالياً'));
                   }
                   return GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.85,
+                      childAspectRatio: 0.9,
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                     ),
-                    itemCount: allServices.length > 6 ? 6 : allServices.length,
+                    itemCount: categories.length > 6 ? 6 : categories.length,
                     itemBuilder: (context, i) {
-                      final s = allServices[i];
-                      return _buildQuickServiceCard(context, s);
+                      final c = categories[i];
+                      return _buildCategoryCard(context, c);
                     },
                   );
                 }
@@ -216,9 +212,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildQuickServiceCard(BuildContext context, ServiceModel service) {
+  Widget _buildCategoryCard(BuildContext context, ServiceCategoryModel category) {
     return InkWell(
-      onTap: () => context.push(ServiceDetailsScreen(service: service)),
+      onTap: () => context.push(CategoryServicesScreen(category: category)),
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -226,19 +222,30 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: borderColor),
+          boxShadow: [BoxShadow(color: textColor.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 4))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(color: tertiaryColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-              child: const Icon(Icons.build_outlined, color: tertiaryColor, size: 26),
+              child: category.icon != null
+                  ? Image.network(category.icon!, width: 28, height: 28, errorBuilder: (_, __, ___) => const Icon(Icons.category_outlined, color: tertiaryColor, size: 28))
+                  : const Icon(Icons.category_outlined, color: tertiaryColor, size: 28),
             ),
             const Spacer(),
-            Text(service.name, style: const TextStyle(fontWeight: FontWeight.bold, color: textColor, fontSize: 15), maxLines: 2, overflow: TextOverflow.ellipsis),
+            Text(
+              category.name,
+              style: const TextStyle(fontWeight: FontWeight.bold, color: textColor, fontSize: 16),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             const SizedBox(height: 4),
-            Text('${service.price} ريال', style: const TextStyle(color: tertiaryColor, fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(
+              '${category.services.length} خدمة صيانة',
+              style: const TextStyle(color: Colors.grey, fontSize: 13),
+            ),
           ],
         ),
       ),

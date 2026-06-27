@@ -61,9 +61,11 @@ class ServiceDetailsScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: borderColor),
                 ),
-                child: Center(
-                  child: Icon(Icons.home_repair_service, size: 80, color: tertiaryColor.withValues(alpha: 0.8)),
-                ),
+                child: service.image != null
+                    ? ClipRRect(borderRadius: BorderRadius.circular(20), child: Image.network(service.image!, width: double.infinity, height: 200, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Center(child: Icon(Icons.home_repair_service, size: 80, color: tertiaryColor.withValues(alpha: 0.8)))))
+                    : Center(
+                        child: Icon(Icons.home_repair_service, size: 80, color: tertiaryColor.withValues(alpha: 0.8)),
+                      ),
               ),
               const SizedBox(height: 24),
               Row(
