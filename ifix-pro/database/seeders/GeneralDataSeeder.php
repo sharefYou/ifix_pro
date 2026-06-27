@@ -12,18 +12,18 @@ class GeneralDataSeeder extends Seeder
     public function run(): void
     {
         // 1. Cities
-        City::create([
+        City::updateOrCreate([
             'name' => ['en' => 'Damascus', 'ar' => 'دمشق'],
             'is_active' => true,
         ]);
         
-        City::create([
+        City::updateOrCreate([
             'name' => ['en' => 'Dubai', 'ar' => 'دبي'],
             'is_active' => true,
         ]);
 
         // 2. Pages
-        Page::create([
+        Page::updateOrCreate([
             'slug' => 'privacy-policy',
             'title' => ['en' => 'Privacy Policy', 'ar' => 'سياسة الخصوصية'],
             'content' => [
@@ -32,7 +32,7 @@ class GeneralDataSeeder extends Seeder
             ],
         ]);
 
-        Page::create([
+        Page::updateOrCreate([
             'slug' => 'terms-and-conditions',
             'title' => ['en' => 'Terms and Conditions', 'ar' => 'الشروط والأحكام'],
             'content' => [
@@ -41,7 +41,7 @@ class GeneralDataSeeder extends Seeder
             ],
         ]);
 
-        Page::create([
+        Page::updateOrCreate([
             'slug' => 'about-us',
             'title' => ['en' => 'About Us', 'ar' => 'معلومات عنا'],
             'content' => [
@@ -51,19 +51,19 @@ class GeneralDataSeeder extends Seeder
         ]);
 
         // 3. FAQs
-        Faq::create([
+        Faq::updateOrCreate([
             'question' => ['en' => 'How can I book a service?', 'ar' => 'كيف يمكنني حجز خدمة؟'],
             'answer' => ['en' => '<p>You can book through our mobile app.</p>', 'ar' => '<p>يمكنك الحجز من خلال تطبيق الهاتف المحمول الخاص بنا.</p>'],
             'sort_order' => 1,
         ]);
 
-        Faq::create([
+        Faq::updateOrCreate([
             'question' => ['en' => 'What payment methods are accepted?', 'ar' => 'ما هي طرق الدفع المقبولة؟'],
             'answer' => ['en' => '<p>We accept Wallet and Cash on Delivery.</p>', 'ar' => '<p>نحن نقبل الدفع عبر المحفظة والدفع عند الاستلام.</p>'],
             'sort_order' => 2,
         ]);
 
-        Faq::create([
+        Faq::updateOrCreate([
             'question' => ['en' => 'How do I contact support?', 'ar' => 'كيف يمكنني التواصل مع الدعم؟'],
             'answer' => ['en' => '<p>Use the Contact Us form in the app.</p>', 'ar' => '<p>استخدم نموذج اتصل بنا في التطبيق.</p>'],
             'sort_order' => 3,
