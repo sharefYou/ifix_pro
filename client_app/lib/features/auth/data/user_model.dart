@@ -2,32 +2,32 @@ class UserModel {
   final int id;
   final String name;
   final String phone;
-  final String email;
-  final String city;
-  final double lat;
-  final double lng;
-  final String image;
+  final String? email;
+  final String? city;
+  final double? lat;
+  final double? lng;
+  final String? image;
 
   UserModel({
     required this.id,
     required this.name,
     required this.phone,
-    required this.email,
-    required this.city,
-    required this.lat,
-    required this.lng,
-    required this.image,
+    this.email,
+    this.city,
+    this.lat,
+    this.lng,
+    this.image,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    id: json["id"],
-    name: json["name"],
-    phone: json["phone"],
-    email: json["email"],
-    city: json["city"],
-    lat: json["lat"].toDouble(),
-    lng: json["lng"].toDouble(),
-    image: json["image"],
+    id: int.tryParse(json["id"]?.toString() ?? "0") ?? 0,
+    name: json["name"]?.toString() ?? "",
+    phone: json["phone"]?.toString() ?? "",
+    email: json["email"]?.toString(),
+    city: json["city"]?.toString(),
+    lat: double.tryParse(json["lat"]?.toString() ?? ""),
+    lng: double.tryParse(json["lng"]?.toString() ?? ""),
+    image: json["image"]?.toString(),
   );
 
   Map<String, dynamic> toJson() => {

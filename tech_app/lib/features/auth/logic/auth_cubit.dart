@@ -13,7 +13,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       final response = await _repo.login(phone, password);
-      emit(AuthSuccess(response['data']['user']));
+      emit(AuthSuccess(response));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -21,27 +21,27 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> register({
     required String name,
-    required String email,
     required String phone,
     required String password,
-    required int cityId,
-    required String specialty,
-    required String idPhoto,
-    required String avatar,
+    required String city,
+    required double lat,
+    required double lng,
+    required String idDocumentPath,
+    required List<int> serviceIds,
   }) async {
     emit(AuthLoading());
     try {
       final response = await _repo.register(
         name: name,
-        email: email,
         phone: phone,
         password: password,
-        cityId: cityId,
-        specialty: specialty,
-        idPhoto: idPhoto,
-        avatar: avatar,
+        city: city,
+        lat: lat,
+        lng: lng,
+        idDocumentPath: idDocumentPath,
+        serviceIds: serviceIds,
       );
-      emit(AuthSuccess(response['data']['user']));
+      emit(AuthSuccess(response));
     } catch (e) {
       emit(AuthError(e.toString()));
     }

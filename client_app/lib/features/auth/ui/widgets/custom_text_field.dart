@@ -53,7 +53,7 @@ class CustomTextField extends StatelessWidget {
               fontFamily: 'Cairo',
               fontSize: 15,
               fontWeight: FontWeight.w500,
-              color: textColor.withOpacity(0.4),
+              color: textColor.withValues(alpha: 0.4),
             ),
             filled: true,
             fillColor: surfaceColor,

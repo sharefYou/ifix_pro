@@ -16,7 +16,7 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request): JsonResponse
     {
-        $otp = (string) rand(1000, 9999);
+        $otp = (string) random_int(1000, 9999);
 
         $user = User::create([
             'name' => $request->name,
@@ -27,18 +27,23 @@ class AuthController extends Controller
             'otp_expires_at' => now()->addMinutes(10),
         ]);
 
-        return response()->json([
+        $payload = [
             'message' => __('messages.user_registered'),
-            'otp' => $otp,
             'user' => new UserResource($user),
-        ]);
+        ];
+
+        if (app()->environment('local', 'testing')) {
+            $payload['otp'] = $otp;
+        }
+
+        return response()->json($payload);
     }
 
     public function verifyOtp(VerifyOtpRequest $request): JsonResponse
     {
         $user = User::where('phone', $request->phone)->first();
 
-        if ($user->otp_code !== $request->otp_code || now()->greaterThan($user->otp_expires_at)) {
+        if (!$user || !hash_equals((string) $user->otp_code, (string) $request->otp_code) || now()->greaterThan($user->otp_expires_at)) {
             return response()->json([
                 'message' => __('messages.invalid_otp'),
             ], 400);
@@ -50,7 +55,7 @@ class AuthController extends Controller
             'otp_expires_at' => null,
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token', ['role:customer'])->plainTextToken;
 
         return response()->json([
             'message' => __('messages.otp_verified'),
@@ -63,7 +68,7 @@ class AuthController extends Controller
     {
         $user = User::where('phone', $request->phone)->first();
 
-        if (!Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'message' => __('auth.failed'),
             ], 401);
@@ -75,7 +80,7 @@ class AuthController extends Controller
             ], 403);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token', ['role:customer'])->plainTextToken;
 
         return response()->json([
             'message' => __('messages.logged_in'),
@@ -88,16 +93,103 @@ class AuthController extends Controller
     {
         $user = User::where('phone', $request->phone)->first();
         
-        $otp = (string) rand(1000, 9999);
+        if (!$user) {
+            return response()->json([
+                'message' => __('messages.user_not_found'),
+            ], 404);
+        }
+
+        $otp = (string) random_int(1000, 9999);
         
         $user->update([
             'otp_code' => $otp,
             'otp_expires_at' => now()->addMinutes(10),
         ]);
 
-        return response()->json([
+        $payload = [
             'message' => __('messages.otp_resent'),
-            'otp' => $otp,
+        ];
+
+        if (app()->environment('local', 'testing')) {
+            $payload['otp'] = $otp;
+        }
+
+        return response()->json($payload);
+    }
+
+    public function forgotPassword(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $request->validate(['phone' => 'required|string']);
+
+        $user = User::where('phone', $request->phone)->first();
+        if (!$user) {
+            return response()->json([
+                'message' => __('messages.user_not_found'),
+            ], 404);
+        }
+
+        $otp = (string) random_int(1000, 9999);
+        $user->update([
+            'otp_code' => $otp,
+            'otp_expires_at' => now()->addMinutes(10),
+        ]);
+
+        $payload = [
+            'message' => __('messages.otp_sent'),
+        ];
+
+        if (app()->environment('local', 'testing')) {
+            $payload['otp'] = $otp;
+        }
+
+        return response()->json($payload);
+    }
+
+    public function verifyResetCode(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'otp_code' => 'required|string',
+        ]);
+
+        $user = User::where('phone', $request->phone)->first();
+
+        if (!$user || !hash_equals((string) $user->otp_code, (string) $request->otp_code) || now()->greaterThan($user->otp_expires_at)) {
+            return response()->json([
+                'message' => __('messages.invalid_otp'),
+            ], 400);
+        }
+
+        return response()->json([
+            'message' => __('messages.otp_verified'),
+        ]);
+    }
+
+    public function resetPassword(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'otp_code' => 'required|string',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = User::where('phone', $request->phone)->first();
+
+        if (!$user || !hash_equals((string) $user->otp_code, (string) $request->otp_code) || now()->greaterThan($user->otp_expires_at)) {
+            return response()->json([
+                'message' => __('messages.invalid_otp'),
+            ], 400);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password),
+            'otp_code' => null,
+            'otp_expires_at' => null,
+        ]);
+
+        return response()->json([
+            'message' => __('messages.password_reset_success'),
         ]);
     }
 }
+

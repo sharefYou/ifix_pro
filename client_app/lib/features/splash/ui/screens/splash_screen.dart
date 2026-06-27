@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:ifix_client/core/helpers/cache_helper.dart';
 import 'package:ifix_client/core/helpers/extensions.dart';
 import 'package:ifix_client/features/auth/ui/screens/login_screen.dart';
+import 'package:ifix_client/features/home/ui/screens/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,7 +17,6 @@ class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
   late AnimationController _mainController;
   late AnimationController _pulseController;
-
   late Animation<double> _fadeLogo;
   late Animation<Offset> _slideLogo;
   late Animation<double> _fadeSubtitle;
@@ -32,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2500),
+      duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
 
     _slideLogo = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero)
@@ -63,9 +64,15 @@ class _SplashScreenState extends State<SplashScreen>
 
     _mainController.forward();
 
-    Timer(const Duration(seconds: 4), () {
-      // Navigator.of(context).pushReplacementNamed('/login');
-      context.pushReplacement(LoginScreen());
+    Timer(const Duration(seconds: 4), () async {
+      final token = await CacheHelper.getData(key: 'token');
+      if (mounted) {
+        if (token != null && token.toString().isNotEmpty) {
+          context.pushReplacement(const HomeScreen());
+        } else {
+          context.pushReplacement(const LoginScreen());
+        }
+      }
     });
   }
 

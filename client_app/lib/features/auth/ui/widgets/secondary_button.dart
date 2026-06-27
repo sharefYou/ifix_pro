@@ -21,7 +21,7 @@ class SecondaryButton extends StatelessWidget {
         foregroundColor: primaryColor,
         padding: const EdgeInsets.symmetric(vertical: 18),
         side: BorderSide(
-          color: borderColor.withOpacity(0.6),
+          color: borderColor.withValues(alpha: 0.6),
           width: 1,
         ),
         shape: RoundedRectangleBorder(

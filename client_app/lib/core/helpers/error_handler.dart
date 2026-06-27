@@ -2,10 +2,25 @@ import 'package:dio/dio.dart';
 
 class ErrorHandler {
   static String handleDioError(DioException e) {
+    if (e.response?.statusCode == 429) {
+      return 'تجاوزت الحد المسموح من المحاولات، يرجى الانتظار قليلاً ثم المحاولة مرة أخرى.';
+    }
+
     if (e.response != null && e.response?.data != null) {
       final data = e.response?.data;
 
       if (data is Map<String, dynamic>) {
+        if (data['errors'] is Map) {
+          final errors = data['errors'] as Map;
+          if (errors.isNotEmpty) {
+            final firstVal = errors.values.first;
+            if (firstVal is List && firstVal.isNotEmpty) {
+              return firstVal.first.toString();
+            } else if (firstVal != null) {
+              return firstVal.toString();
+            }
+          }
+        }
         final message = data['message'] ?? data['error'] ?? data['detail'];
         if (message != null && message.toString().trim().isNotEmpty) {
           return message.toString();

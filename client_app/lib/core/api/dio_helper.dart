@@ -2,22 +2,53 @@ import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ifix_client/core/api/api_constants.dart';
+import 'package:ifix_client/core/helpers/cache_helper.dart';
 import 'package:ifix_client/main.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class DioHelper {
   static Dio? dio;
 
-  static void initialDio() {
+  static void initialDio({String? baseUrl}) {
     dio = Dio(
       BaseOptions(
-        baseUrl: ApiConstants.baseURL,
+        baseUrl: baseUrl ?? ApiConstants.baseURL,
         receiveDataWhenStatusError: true,
         headers: {'Accept': 'application/json'},
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
-        sendTimeout: const Duration(seconds: 5),
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+        sendTimeout: const Duration(seconds: 15),
         followRedirects: true,
+      ),
+    );
+
+    dio?.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          options.headers['Accept'] = 'application/json';
+          options.headers['Content-Type'] = 'application/json';
+
+          final context = navigatorKey.currentContext;
+          final lang = context != null && EasyLocalization.of(context) != null
+              ? EasyLocalization.of(context)!.locale.languageCode
+              : 'en';
+          options.headers['Accept-Language'] = lang;
+          options.headers['X-App-Locale'] = lang;
+
+          final token = await CacheHelper.getData(key: 'token');
+          if (token != null && token.toString().isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+
+          return handler.next(options);
+        },
+        onError: (DioException error, handler) async {
+          if (error.response?.statusCode == 401) {
+            await CacheHelper.deleteData();
+            // Token revoked or expired; trigger app logout flow
+          }
+          return handler.next(error);
+        },
       ),
     );
 
@@ -33,38 +64,30 @@ class DioHelper {
     }
   }
 
-  static Map<String, dynamic> _buildHeaders({String? token}) {
-    return {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'X-App-Locale': EasyLocalization.of(
-        navigatorKey.currentContext!,
-      )!.locale.languageCode,
-      if (token != null) 'Authorization': 'Bearer $token',
-    };
+  static void updateBaseUrl(String newBaseUrl) {
+    dio?.options.baseUrl = newBaseUrl;
   }
 
   static Future<Response> getData({
     required String endPoint,
     Map<String, dynamic>? query,
-    String? token,
+    Options? options,
   }) async {
-    dio!.options.headers = _buildHeaders(token: token);
-    return await dio!.get(endPoint, queryParameters: query);
+    return await dio!.get(endPoint, queryParameters: query, options: options);
   }
 
   static Future<Response> postData({
     required String endPoint,
     Object? data,
     Map<String, dynamic>? query,
-    String? token,
+    Options? options,
     void Function(int count, int total)? onSendProgress,
   }) async {
-    dio!.options.headers = _buildHeaders(token: token);
     return await dio!.post(
       endPoint,
       data: data,
       queryParameters: query,
+      options: options,
       onSendProgress: onSendProgress,
     );
   }
@@ -73,14 +96,14 @@ class DioHelper {
     required String endPoint,
     Object? data,
     Map<String, dynamic>? query,
-    String? token,
+    Options? options,
     void Function(int count, int total)? onSendProgress,
   }) async {
-    dio!.options.headers = _buildHeaders(token: token);
     return await dio!.put(
       endPoint,
       data: data,
       queryParameters: query,
+      options: options,
       onSendProgress: onSendProgress,
     );
   }
@@ -89,10 +112,13 @@ class DioHelper {
     required String endPoint,
     Object? data,
     Map<String, dynamic>? query,
-    String? token,
-    void Function(int count, int total)? onSendProgress,
+    Options? options,
   }) async {
-    dio!.options.headers = _buildHeaders(token: token);
-    return await dio!.delete(endPoint, data: data, queryParameters: query);
+    return await dio!.delete(
+      endPoint,
+      data: data,
+      queryParameters: query,
+      options: options,
+    );
   }
 }

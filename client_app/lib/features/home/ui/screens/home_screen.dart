@@ -1,0 +1,247 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ifix_client/core/helpers/extensions.dart';
+import '../../../custom_requests/manager/custom_requests_cubit.dart';
+import '../../../custom_requests/ui/screens/my_custom_requests_screen.dart';
+import '../../../orders/manager/orders_cubit.dart';
+import '../../../orders/ui/screens/my_orders_screen.dart';
+import '../../../profile/manager/profile_cubit.dart';
+import '../../../profile/ui/screens/profile_screen.dart';
+import '../../../services/data/models/service_model.dart';
+import '../../../services/manager/services_cubit.dart';
+import '../../../services/manager/services_states.dart';
+import '../../../services/ui/screens/search_screen.dart';
+import '../../../services/ui/screens/service_details_screen.dart';
+import '../../../services/ui/screens/services_screen.dart';
+import '../../../wallet/manager/wallet_cubit.dart';
+import '../../../wallet/ui/screens/wallet_screen.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  static const Color backgroundColor = Color(0xFFFAF5EE);
+  static const Color tertiaryColor = Color(0xFF8C3C3C);
+  static const Color borderColor = Color(0xFFD8D0C8);
+  static const Color textColor = Color(0xFF3A302A);
+
+  int _currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          _buildHomeDashboard(context),
+          const MyOrdersScreen(),
+          const WalletScreen(),
+          const ProfileScreen(),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: const Border(top: BorderSide(color: borderColor)),
+          boxShadow: [BoxShadow(color: textColor.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -4))],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (idx) => setState(() => _currentIndex = idx),
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: tertiaryColor,
+          unselectedItemColor: Colors.grey,
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'الرئيسية'),
+            BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), activeIcon: Icon(Icons.assignment), label: 'طلباتي'),
+            BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet_outlined), activeIcon: Icon(Icons.account_balance_wallet), label: 'المحفظة'),
+            BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'حسابي'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHomeDashboard(BuildContext context) {
+    return SafeArea(
+      child: RefreshIndicator(
+        color: tertiaryColor,
+        onRefresh: () async {
+          context.read<ServicesCubit>().fetchServices();
+        },
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('أهلاً بك في iFix Pro 👋', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: textColor)),
+                    SizedBox(height: 4),
+                    Text('ما هي الخدمة التي تحتاجها اليوم؟', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                  ],
+                ),
+                InkWell(
+                  onTap: () => setState(() => _currentIndex = 3),
+                  borderRadius: BorderRadius.circular(25),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(color: tertiaryColor.withValues(alpha: 0.1), shape: BoxShape.circle),
+                    child: const Icon(Icons.person, color: tertiaryColor),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            InkWell(
+              onTap: () => context.push(const SearchScreen()),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: borderColor),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.search, color: tertiaryColor),
+                    SizedBox(width: 12),
+                    Text('ابحث عن كهرباء، سباكة، تكييف...', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            InkWell(
+              onTap: () => context.push(const MyCustomRequestsScreen()),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [tertiaryColor, Color(0xFFA54848)], begin: Alignment.centerRight, end: Alignment.centerLeft),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [BoxShadow(color: tertiaryColor.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 6))],
+                ),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('لديك عطل مخصص ومستعجل؟', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                          SizedBox(height: 6),
+                          Text('اطرح مناقصة واحصل على عروض أسعار من فنيين معتمدين بالقرب منك في دقائق.', style: TextStyle(color: Colors.white, fontSize: 13, height: 1.4)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
+                      child: const Icon(Icons.handyman, color: Colors.white, size: 36),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('الأقسام والخدمات', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor)),
+                TextButton(
+                  onPressed: () => context.push(const ServicesScreen()),
+                  child: const Text('عرض الكل', style: TextStyle(color: tertiaryColor, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            BlocBuilder<ServicesCubit, ServicesStates>(
+              builder: (context, state) {
+                if (state is ServicesLoadingState) {
+                  return const Center(
+                    child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator(color: tertiaryColor)),
+                  );
+                } else if (state is ServicesErrorState) {
+                  return Container(
+                    padding: const EdgeInsets.all(24),
+                    alignment: Alignment.center,
+                    child: Text(state.error, style: const TextStyle(color: Colors.red)),
+                  );
+                } else if (state is ServicesLoadedState) {
+                  if (state.categories.isEmpty) {
+                    return Container(
+                      padding: const EdgeInsets.all(24),
+                      alignment: Alignment.center,
+                      child: const Text('لا توجد خدمات متاحة حالياً'),
+                    );
+                  }
+                  // Show all services combined or category grid
+                  final allServices = state.categories.expand((c) => c.services).toList();
+                  if (allServices.isEmpty) {
+                    return const Center(child: Text('لا توجد خدمات حالياً'));
+                  }
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.85,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                    ),
+                    itemCount: allServices.length > 6 ? 6 : allServices.length,
+                    itemBuilder: (context, i) {
+                      final s = allServices[i];
+                      return _buildQuickServiceCard(context, s);
+                    },
+                  );
+                }
+                return const SizedBox();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickServiceCard(BuildContext context, ServiceModel service) {
+    return InkWell(
+      onTap: () => context.push(ServiceDetailsScreen(service: service)),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: borderColor),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: tertiaryColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+              child: const Icon(Icons.build_outlined, color: tertiaryColor, size: 26),
+            ),
+            const Spacer(),
+            Text(service.name, style: const TextStyle(fontWeight: FontWeight.bold, color: textColor, fontSize: 15), maxLines: 2, overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 4),
+            Text('${service.price} ريال', style: const TextStyle(color: tertiaryColor, fontWeight: FontWeight.bold, fontSize: 13)),
+          ],
+        ),
+      ),
+    );
+  }
+}

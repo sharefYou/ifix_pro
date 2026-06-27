@@ -7,6 +7,7 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/routing/app_router.dart';
 import '../../../../core/widgets/ifix_button.dart';
 import '../../../../core/widgets/ifix_text_field.dart';
+import '../../../../core/l10n/app_localizations.dart';
 import '../../logic/auth_cubit.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -40,12 +41,12 @@ class _LoginScreenState extends State<LoginScreen> {
         if (state is AuthSuccess) {
           context.go(AppRoutes.home);
         } else if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message, style: const TextStyle(fontFamily: 'Cairo'))));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message, style: Theme.of(context).textTheme.bodyMedium)));
         }
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('دخول الفني'),
+          title: Text(AppLocalizations.of(context)?.login ?? 'تسجيل الدخول'),
           leading: IconButton(
             onPressed: () => context.go(AppRoutes.welcome),
             icon: const Icon(Icons.arrow_back_ios_rounded),
@@ -107,10 +108,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('ليس لديك حساب؟ ', style: TextStyle(fontFamily: 'Cairo')),
+                    Text('ليس لديك حساب؟ ', style: Theme.of(context).textTheme.bodyMedium),
                     TextButton(
                       onPressed: () => context.go(AppRoutes.register),
-                      child: const Text('سجل كفني جديد', style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
+                      child: Text(AppLocalizations.of(context)?.register ?? 'سجل كفني جديد', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.primary)),
                     ),
                   ],
                 ),

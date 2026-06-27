@@ -21,6 +21,15 @@ class CustomRequestController extends Controller
     {
     }
 
+    public function index(): JsonResponse
+    {
+        $requests = CustomRequest::where('user_id', auth()->id())->latest()->get();
+
+        return response()->json([
+            'data' => CustomRequestResource::collection($requests),
+        ]);
+    }
+
     public function store(CreateCustomRequestRequest $request): JsonResponse
     {
         $data = $request->validated();

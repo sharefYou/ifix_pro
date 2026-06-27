@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../../../../core/api/dio_factory.dart';
+import '../../../../core/errors/error_handler.dart';
 
 class AuthRepository {
   Future<Map<String, dynamic>> login(String phone, String password) async {
@@ -10,55 +11,51 @@ class AuthRepository {
         'password': password,
       });
 
-      if (response.data['status'] == true) {
-        final token = response.data['data']['token'];
+      final data = response.data as Map<String, dynamic>;
+      final token = data['token']?.toString();
+      if (token != null && token.isNotEmpty) {
         await DioFactory.saveToken(token);
-        return response.data;
+        return data;
       } else {
-        throw response.data['message'] ?? 'Login failed';
+        throw data['message'] ?? 'Login failed';
       }
-    } on DioException catch (e) {
-      throw e.response?.data['message'] ?? 'Connection error';
     } catch (e) {
-      throw e.toString();
+      throw ErrorHandler.handleGeneralError(e);
     }
   }
 
   Future<Map<String, dynamic>> register({
     required String name,
-    required String email,
     required String phone,
     required String password,
-    required int cityId,
-    required String specialty,
-    required String idPhoto,
-    required String avatar,
+    required String city,
+    required double lat,
+    required double lng,
+    required String idDocumentPath,
+    required List<int> serviceIds,
   }) async {
     try {
       final dio = await DioFactory.getDio();
-      final response = await dio.post('register', data: {
+
+      final formData = FormData.fromMap({
         'name': name,
-        'email': email,
         'phone': phone,
         'password': password,
-        'city_id': cityId,
-        'specialty': specialty,
-        'id_photo': idPhoto,
-        'avatar': avatar,
-        'role': 'tech',
+        'password_confirmation': password,
+        'city': city,
+        'lat': lat,
+        'lng': lng,
+        'id_document': await MultipartFile.fromFile(idDocumentPath),
       });
 
-      if (response.data['status'] == true) {
-        final token = response.data['data']['token'];
-        await DioFactory.saveToken(token);
-        return response.data;
-      } else {
-        throw response.data['message'] ?? 'Registration failed';
+      for (final id in serviceIds) {
+        formData.fields.add(MapEntry('service_ids[]', id.toString()));
       }
-    } on DioException catch (e) {
-      throw e.response?.data['message'] ?? 'Connection error';
+
+      final response = await dio.post('register', data: formData);
+      return response.data as Map<String, dynamic>;
     } catch (e) {
-      throw e.toString();
+      throw ErrorHandler.handleGeneralError(e);
     }
   }
 
@@ -66,6 +63,8 @@ class AuthRepository {
     try {
       final dio = await DioFactory.getDio();
       await dio.post('logout');
+    } catch (e) {
+      // Ignore network errors on logout
     } finally {
       await DioFactory.deleteToken();
     }

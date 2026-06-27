@@ -1,22 +1,31 @@
+import 'dart:ui' as ui;
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class DioFactory {
-  static const String _baseUrl = 'http://10.0.2.2:9999/api/';
+  static const String _defaultBaseUrl = 'http://ifix-pro.sy/api/v1/technician/';
   static const String _tokenKey = 'auth_token';
   static final _storage = const FlutterSecureStorage();
 
   static Dio? _dio;
 
-  static Future<Dio> getDio() async {
-    if (_dio != null) return _dio!;
+  static void updateBaseUrl(String newUrl) {
+    _dio?.options.baseUrl = newUrl;
+  }
+
+  static Future<Dio> getDio({String? customBaseUrl}) async {
+    if (_dio != null) {
+      if (customBaseUrl != null) _dio!.options.baseUrl = customBaseUrl;
+      return _dio!;
+    }
 
     _dio = Dio(BaseOptions(
-      baseUrl: _baseUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
+      baseUrl: customBaseUrl ?? _defaultBaseUrl,
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
+      sendTimeout: const Duration(seconds: 15),
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -25,11 +34,25 @@ class DioFactory {
 
     _dio!.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
+        options.headers['Accept'] = 'application/json';
+        options.headers['Content-Type'] = 'application/json';
+
+        final lang = ui.PlatformDispatcher.instance.locale.languageCode;
+        options.headers['Accept-Language'] = lang;
+        options.headers['X-App-Locale'] = lang;
+
         final token = await _storage.read(key: _tokenKey);
-        if (token != null) {
+        if (token != null && token.isNotEmpty) {
           options.headers['Authorization'] = 'Bearer $token';
         }
         return handler.next(options);
+      },
+      onError: (DioException error, handler) async {
+        if (error.response?.statusCode == 401) {
+          await deleteToken();
+          // Token expired or revoked; trigger app logout navigation
+        }
+        return handler.next(error);
       },
     ));
 
@@ -38,10 +61,7 @@ class DioFactory {
         requestHeader: true,
         requestBody: true,
         responseBody: true,
-        responseHeader: false,
-        error: true,
-        compact: true,
-        maxWidth: 90,
+        responseHeader: true,
       ));
     }
 

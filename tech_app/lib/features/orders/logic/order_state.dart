@@ -17,6 +17,14 @@ class OrdersLoaded extends OrderState {
   List<Object?> get props => [orders];
 }
 
+class MyOrdersLoaded extends OrderState {
+  final List<dynamic> orders;
+  MyOrdersLoaded(this.orders);
+
+  @override
+  List<Object?> get props => [orders];
+}
+
 class OrderActionLoading extends OrderState {}
 
 class OrderActionSuccess extends OrderState {

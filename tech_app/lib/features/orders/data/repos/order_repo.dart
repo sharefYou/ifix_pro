@@ -1,31 +1,36 @@
 import '../../../../core/api/dio_factory.dart';
+import '../../../../core/errors/error_handler.dart';
 
 class OrderRepository {
   Future<List<dynamic>> getAvailableOrders() async {
     try {
       final dio = await DioFactory.getDio();
       final response = await dio.get('orders/available');
-      return response.data['data'];
+      return (response.data as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
     } catch (e) {
-      throw e.toString();
+      throw ErrorHandler.handleGeneralError(e);
     }
   }
 
-  Future<void> acceptOrder(int orderId) async {
+  Future<String> acceptOrder(int orderId) async {
     try {
       final dio = await DioFactory.getDio();
-      await dio.post('orders/$orderId/accept');
+      final response = await dio.post('orders/$orderId/accept');
+      final data = response.data as Map<String, dynamic>? ?? {};
+      return data['message']?.toString() ?? '';
     } catch (e) {
-      throw e.toString();
+      throw ErrorHandler.handleGeneralError(e);
     }
   }
 
-  Future<void> completeOrder(int orderId) async {
+  Future<String> completeOrder(int orderId) async {
     try {
       final dio = await DioFactory.getDio();
-      await dio.post('orders/$orderId/complete');
+      final response = await dio.post('orders/$orderId/complete');
+      final data = response.data as Map<String, dynamic>? ?? {};
+      return data['message']?.toString() ?? '';
     } catch (e) {
-      throw e.toString();
+      throw ErrorHandler.handleGeneralError(e);
     }
   }
 
@@ -33,9 +38,9 @@ class OrderRepository {
     try {
       final dio = await DioFactory.getDio();
       final response = await dio.get('orders/my');
-      return response.data['data'];
+      return (response.data as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
     } catch (e) {
-      throw e.toString();
+      throw ErrorHandler.handleGeneralError(e);
     }
   }
 }

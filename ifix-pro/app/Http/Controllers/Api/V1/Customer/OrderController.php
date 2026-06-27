@@ -16,6 +16,15 @@ class OrderController extends Controller
     {
     }
 
+    public function index(): JsonResponse
+    {
+        $orders = Order::with(['service', 'technician'])->where('user_id', auth()->id())->latest()->get();
+
+        return response()->json([
+            'data' => $orders,
+        ]);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([

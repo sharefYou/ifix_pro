@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ifix_client/core/helpers/extensions.dart';
 import 'package:ifix_client/features/auth/manager/auth_cubit.dart';
 import 'package:ifix_client/features/auth/manager/auth_states.dart';
+import 'package:ifix_client/features/home/ui/screens/home_screen.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/secondary_button.dart';
+import 'forgot_password_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -37,18 +41,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Adding Directionality for RTL support since the text is in Arabic
     return BlocProvider<AuthCubit>(
       create: (context) => AuthCubit(),
       child: BlocConsumer<AuthCubit, AuthStates>(
-        listener: (context, state) {},
-        builder: (context, state) {
-          if (state is LoginLoadingState) {
-            return Center(child: CircularProgressIndicator());
-          }
+        listener: (context, state) {
           if (state is LoginErrorState) {
-            return Center(child: Text(state.error));
+            context.showOverlaySnackBar(
+              message: state.error,
+              type: Error(),
+              position: SnackPosition.top,
+            );
+          } else if (state is LoginSuccessState) {
+            context.showOverlaySnackBar(
+              message: 'تم تسجيل الدخول بنجاح',
+              type: Success(),
+              position: SnackPosition.top,
+            );
+            context.pushAndRemoveUntil(
+              const HomeScreen(),
+              (route) => false,
+            );
           }
+        },
+        builder: (context, state) {
           return Directionality(
             textDirection: TextDirection.rtl,
             child: Scaffold(
@@ -130,7 +145,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               Align(
                                 alignment: AlignmentDirectional.centerEnd,
                                 child: TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    context.push(const ForgotPasswordScreen());
+                                  },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
                                     minimumSize: Size.zero,
@@ -153,9 +170,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               // Primary Button
                               PrimaryButton(
                                 text: 'تسجيل الدخول',
+                                isLoading: state is LoginLoadingState,
                                 onPressed: () {
+                                  if (phoneController.text.trim().isEmpty ||
+                                      passwordController.text.isEmpty) {
+                                    context.showOverlaySnackBar(
+                                      message: 'الرجاء تعبئة جميع الحقول',
+                                      type: Error(),
+                                      position: SnackPosition.top,
+                                    );
+                                    return;
+                                  }
                                   context.read<AuthCubit>().login(
-                                    phone: phoneController.text,
+                                    phone: phoneController.text.trim(),
                                     password: passwordController.text,
                                   );
                                 },
@@ -165,7 +192,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               // Secondary Button
                               SecondaryButton(
                                 text: 'إنشاء حساب جديد',
-                                onPressed: () {},
+                                onPressed: () {
+                                  context.push(const RegisterScreen());
+                                },
                               ),
                             ],
                           ),
