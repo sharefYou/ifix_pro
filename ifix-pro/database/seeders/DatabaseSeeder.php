@@ -13,7 +13,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminSeeder::class,
+            ThemeSettingSeeder::class,
             GeneralDataSeeder::class,
+            ServiceSeeder::class,
+            UserSeeder::class,
+            OrderAndReviewSeeder::class,
+            CustomRequestAndBidSeeder::class,
+            RechargeCardSeeder::class,
         ]);
     }
 }
