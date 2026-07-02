@@ -13,7 +13,7 @@ class ServiceCategoryResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'icon' => $this->icon ? asset('storage/' . $this->icon) : null,
+            'icon' => $this->icon ? (str_starts_with($this->icon, 'http') ? $this->icon : url('storage/' . $this->icon)) : null,
             'services' => ServiceResource::collection($this->whenLoaded('services')),
         ];
     }

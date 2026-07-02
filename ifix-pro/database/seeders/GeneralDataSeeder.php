@@ -14,13 +14,19 @@ class GeneralDataSeeder extends Seeder
         // 1. Cities
         $cities = [
             ['en' => 'Damascus', 'ar' => 'دمشق'],
-            ['en' => 'Dubai', 'ar' => 'دبي'],
-            ['en' => 'Riyadh', 'ar' => 'الرياض'],
-            ['en' => 'Jeddah', 'ar' => 'جدة'],
-            ['en' => 'Abu Dhabi', 'ar' => 'أبو ظبي'],
-            ['en' => 'Cairo', 'ar' => 'القاهرة'],
-            ['en' => 'Doha', 'ar' => 'الدوحة'],
-            ['en' => 'Kuwait City', 'ar' => 'مدينة الكويت'],
+            ['en' => 'Rif Dimashq', 'ar' => 'ريف دمشق'],
+            ['en' => 'Aleppo', 'ar' => 'حلب'],
+            ['en' => 'Homs', 'ar' => 'حمص'],
+            ['en' => 'Hama', 'ar' => 'حماة'],
+            ['en' => 'Latakia', 'ar' => 'اللاذقية'],
+            ['en' => 'Tartus', 'ar' => 'طرطوس'],
+            ['en' => 'Idlib', 'ar' => 'إدلب'],
+            ['en' => 'Daraa', 'ar' => 'درعا'],
+            ['en' => 'As-Suwayda', 'ar' => 'السويداء'],
+            ['en' => 'Quneitra', 'ar' => 'القنيطرة'],
+            ['en' => 'Deir ez-Zor', 'ar' => 'دير الزور'],
+            ['en' => 'Raqqa', 'ar' => 'الرقة'],
+            ['en' => 'Al-Hasakah', 'ar' => 'الحسكة'],
         ];
 
         foreach ($cities as $city) {

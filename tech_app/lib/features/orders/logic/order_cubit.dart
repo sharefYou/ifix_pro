@@ -1,7 +1,6 @@
-import 'dart:ui' as ui;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../../../core/l10n/app_localizations.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../data/repos/order_repo.dart';
 
 part 'order_state.dart';
@@ -12,12 +11,11 @@ class OrderCubit extends Cubit<OrderState> {
   OrderCubit(this._repo) : super(OrderInitial());
 
   String _getLocalizedFallback(String key) {
-    final l10n = lookupAppLocalizations(ui.PlatformDispatcher.instance.locale);
     switch (key) {
       case 'accept':
-        return l10n.acceptOrder;
+        return 'accept_order'.tr();
       case 'complete':
-        return l10n.completeOrder;
+        return 'complete_order'.tr();
       default:
         return '';
     }

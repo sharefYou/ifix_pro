@@ -62,4 +62,17 @@ class GeneralController extends Controller
             'message' => __('messages.contact_message_sent', [], app()->getLocale() ?? 'en'),
         ]);
     }
+
+    public function settings(): JsonResponse
+    {
+        $theme = \App\Models\ThemeSetting::first();
+        return response()->json([
+            'data' => [
+                'brand_name' => $theme?->brand_name ?? 'iFix',
+                'primary_color' => $theme?->primary_color ?? '#1A237E',
+                'font_family' => $theme?->font_family ?? 'Cairo',
+                'currency' => $theme?->currency ?? 'SYP',
+            ]
+        ]);
+    }
 }

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ifix_client/core/helpers/extensions.dart';
-import '../../../custom_requests/manager/custom_requests_cubit.dart';
 import '../../../custom_requests/ui/screens/my_custom_requests_screen.dart';
-import '../../../orders/manager/orders_cubit.dart';
 import '../../../orders/ui/screens/my_orders_screen.dart';
-import '../../../profile/manager/profile_cubit.dart';
 import '../../../profile/ui/screens/profile_screen.dart';
 import '../../../services/data/models/service_model.dart';
 import '../../../services/manager/services_cubit.dart';
@@ -13,7 +10,6 @@ import '../../../services/manager/services_states.dart';
 import '../../../services/ui/screens/category_services_screen.dart';
 import '../../../services/ui/screens/search_screen.dart';
 import '../../../services/ui/screens/services_screen.dart';
-import '../../../wallet/manager/wallet_cubit.dart';
 import '../../../wallet/ui/screens/wallet_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -231,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(color: tertiaryColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
               child: category.icon != null
-                  ? Image.network(category.icon!, width: 28, height: 28, errorBuilder: (_, __, ___) => const Icon(Icons.category_outlined, color: tertiaryColor, size: 28))
+                  ? Image.network(category.icon!, width: 28, height: 28, errorBuilder: (_, _, _) => const Icon(Icons.category_outlined, color: tertiaryColor, size: 28))
                   : const Icon(Icons.category_outlined, color: tertiaryColor, size: 28),
             ),
             const Spacer(),

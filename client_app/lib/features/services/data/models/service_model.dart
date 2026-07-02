@@ -1,10 +1,18 @@
 String? _fixEmulatorUrl(String? url) {
   if (url == null || url.trim().isEmpty) return null;
   var fixed = url.trim();
-  if (fixed.contains('127.0.0.1')) {
-    fixed = fixed.replaceAll('127.0.0.1', '10.0.2.2');
-  } else if (fixed.contains('localhost')) {
-    fixed = fixed.replaceAll('localhost', '10.0.2.2');
+  const baseUrl = 'https://sharef.alwaysdata.net';
+  if (fixed.contains('127.0.0.1') || fixed.contains('localhost') || fixed.contains('10.0.2.2')) {
+    final uri = Uri.tryParse(fixed);
+    if (uri != null && uri.path.isNotEmpty) {
+      return '$baseUrl${uri.path}';
+    }
+  }
+  if (!fixed.startsWith('http')) {
+    if (fixed.startsWith('/')) {
+      return '$baseUrl$fixed';
+    }
+    return '$baseUrl/$fixed';
   }
   return fixed;
 }

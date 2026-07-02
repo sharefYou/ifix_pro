@@ -19,16 +19,28 @@ class UserModel {
     this.image,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    id: int.tryParse(json["id"]?.toString() ?? "0") ?? 0,
-    name: json["name"]?.toString() ?? "",
-    phone: json["phone"]?.toString() ?? "",
-    email: json["email"]?.toString(),
-    city: json["city"]?.toString(),
-    lat: double.tryParse(json["lat"]?.toString() ?? ""),
-    lng: double.tryParse(json["lng"]?.toString() ?? ""),
-    image: json["image"]?.toString(),
-  );
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    String? rawImage = json["image"]?.toString();
+    if (rawImage != null && rawImage.isNotEmpty) {
+      const baseUrl = 'https://sharef.alwaysdata.net';
+      if (rawImage.contains('localhost') || rawImage.contains('127.0.0.1') || rawImage.contains('10.0.2.2')) {
+        final uri = Uri.tryParse(rawImage);
+        if (uri != null && uri.path.isNotEmpty) rawImage = '$baseUrl${uri.path}';
+      } else if (!rawImage.startsWith('http')) {
+        rawImage = rawImage.startsWith('/') ? '$baseUrl$rawImage' : '$baseUrl/$rawImage';
+      }
+    }
+    return UserModel(
+      id: int.tryParse(json["id"]?.toString() ?? "0") ?? 0,
+      name: json["name"]?.toString() ?? "",
+      phone: json["phone"]?.toString() ?? "",
+      email: json["email"]?.toString(),
+      city: json["city"]?.toString(),
+      lat: double.tryParse(json["lat"]?.toString() ?? ""),
+      lng: double.tryParse(json["lng"]?.toString() ?? ""),
+      image: rawImage,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     "id": id,

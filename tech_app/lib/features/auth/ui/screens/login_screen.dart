@@ -7,7 +7,7 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/routing/app_router.dart';
 import '../../../../core/widgets/ifix_button.dart';
 import '../../../../core/widgets/ifix_text_field.dart';
-import '../../../../core/l10n/app_localizations.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../logic/auth_cubit.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context)?.login ?? 'تسجيل الدخول'),
+          title: Text('login'.tr()),
           leading: IconButton(
             onPressed: () => context.go(AppRoutes.welcome),
             icon: const Icon(Icons.arrow_back_ios_rounded),
@@ -73,32 +73,32 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                Text('مرحباً بك مجدداً!', style: AppTextStyles.headlineLarge),
+                Text('welcome_back'.tr(), style: AppTextStyles.headlineLarge),
                 const SizedBox(height: 8),
-                Text('أدخل بياناتك للمتابعة وتقديم خدماتك للعملاء', style: AppTextStyles.bodyMedium),
+                Text('login_subtitle'.tr(), style: AppTextStyles.bodyMedium),
                 const SizedBox(height: 32),
                 IFixTextField(
-                  hint: '09xxxxxxxx',
-                  label: 'رقم الجوال',
+                  hint: 'phone_hint'.tr(),
+                  label: 'phone'.tr(),
                   controller: _phoneCtrl,
                   keyboardType: TextInputType.phone,
                   prefixIcon: const Icon(Icons.phone_android_rounded, size: 20),
-                  validator: (v) => (v?.length ?? 0) < 9 ? 'رقم جوال غير صالح' : null,
+                  validator: (v) => (v?.length ?? 0) < 9 ? 'invalid_phone'.tr() : null,
                 ),
                 const SizedBox(height: AppConstants.spacingMD),
                 IFixTextField(
-                  hint: 'كلمة المرور',
-                  label: 'كلمة المرور',
+                  hint: 'password_hint'.tr(),
+                  label: 'password'.tr(),
                   controller: _passCtrl,
                   obscureText: true,
                   prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
-                  validator: (v) => (v?.length ?? 0) < 6 ? 'كلمة المرور قصيرة' : null,
+                  validator: (v) => (v?.length ?? 0) < 6 ? 'password_short'.tr() : null,
                 ),
                 const SizedBox(height: 24),
                 BlocBuilder<AuthCubit, AuthState>(
                   builder: (context, state) {
                     return IFixButton(
-                      label: 'تسجيل الدخول',
+                      label: 'sign_in'.tr(),
                       onTap: _onLogin,
                       isLoading: state is AuthLoading,
                     );
@@ -108,10 +108,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('ليس لديك حساب؟ ', style: Theme.of(context).textTheme.bodyMedium),
+                    Text('no_account'.tr(), style: Theme.of(context).textTheme.bodyMedium),
                     TextButton(
                       onPressed: () => context.go(AppRoutes.register),
-                      child: Text(AppLocalizations.of(context)?.register ?? 'سجل كفني جديد', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.primary)),
+                      child: Text('register'.tr(), style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.primary)),
                     ),
                   ],
                 ),

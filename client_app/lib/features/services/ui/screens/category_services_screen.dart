@@ -65,7 +65,7 @@ class CategoryServicesScreen extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(color: tertiaryColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
               child: service.image != null
-                  ? Image.network(service.image!, width: 28, height: 28, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.build_outlined, color: tertiaryColor, size: 28))
+                  ? Image.network(service.image!, width: 28, height: 28, fit: BoxFit.cover, errorBuilder: (_, _, _) => const Icon(Icons.build_outlined, color: tertiaryColor, size: 28))
                   : const Icon(Icons.build_outlined, color: tertiaryColor, size: 28),
             ),
             const Spacer(),

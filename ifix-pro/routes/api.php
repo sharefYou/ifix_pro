@@ -13,6 +13,7 @@ Route::prefix('v1/general')->middleware([\App\Http\Middleware\SetLocale::class])
     Route::get('/faqs', [\App\Http\Controllers\Api\V1\General\GeneralController::class, 'faqs']);
     Route::get('/pages/{slug}', [\App\Http\Controllers\Api\V1\General\GeneralController::class, 'page']);
     Route::post('/contact-us', [\App\Http\Controllers\Api\V1\General\GeneralController::class, 'contactUs']);
+    Route::get('/settings', [\App\Http\Controllers\Api\V1\General\GeneralController::class, 'settings']);
 });
 
 Route::prefix('v1/customer')->middleware([\App\Http\Middleware\SetLocale::class])->group(function () {

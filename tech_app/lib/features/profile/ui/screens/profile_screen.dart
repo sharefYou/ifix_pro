@@ -18,9 +18,9 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isOnline = true;
   final _nameCtrl = TextEditingController(text: 'أحمد محمد العلي');
-  final _phoneCtrl = TextEditingController(text: '0501234567');
+  final _phoneCtrl = TextEditingController(text: '0933123456');
   final _specialtyCtrl = TextEditingController(text: 'مكيفات');
-  final _ibanCtrl = TextEditingController(text: 'SA12 3456 7890 1234 5678 9012');
+  final _ibanCtrl = TextEditingController(text: 'SY12 0011 2233 4455 6677 8899');
 
   @override
   void dispose() {

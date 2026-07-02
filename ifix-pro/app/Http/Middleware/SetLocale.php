@@ -10,7 +10,12 @@ class SetLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = session('locale', config('app.locale', 'ar'));
+        // يقرأ Accept-Language header من تطبيق الموبايل أولاً
+        $headerLocale = $request->header('Accept-Language');
+        $locale = $headerLocale && in_array($headerLocale, ['ar', 'en'])
+            ? $headerLocale
+            : session('locale', config('app.locale', 'ar'));
+
         app()->setLocale($locale);
 
         return $next($request);

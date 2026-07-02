@@ -3,9 +3,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DioFactory {
-  static const String _defaultBaseUrl = 'http://ifix-pro.sy/api/v1/technician/';
+  static const String _defaultBaseUrl = 'https://sharef.alwaysdata.net/api/v1/technician/';
   static const String _tokenKey = 'auth_token';
   static final _storage = const FlutterSecureStorage();
 
@@ -37,7 +38,8 @@ class DioFactory {
         options.headers['Accept'] = 'application/json';
         options.headers['Content-Type'] = 'application/json';
 
-        final lang = ui.PlatformDispatcher.instance.locale.languageCode;
+        final prefs = await SharedPreferences.getInstance();
+        final lang = prefs.getString('app_language') ?? ui.PlatformDispatcher.instance.locale.languageCode;
         options.headers['Accept-Language'] = lang;
         options.headers['X-App-Locale'] = lang;
 

@@ -61,6 +61,14 @@ class ManageTheme extends Page implements HasForms
                             ->image()
                             ->directory('settings')
                             ->maxSize(2048),
+                        Select::make('currency')
+                            ->label('نوع العملة المعتمدة')
+                            ->options([
+                                'SYP' => 'ليرة سورية (ل.س / SYP)',
+                                'USD' => 'دولار أمريكي ($ / USD)',
+                            ])
+                            ->default('SYP')
+                            ->required(),
                     ])->columns(2),
 
                 Section::make(fn() => __('admin.appearance'))

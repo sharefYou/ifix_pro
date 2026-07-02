@@ -1,18 +1,18 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ifix_tech/core/api/dio_factory.dart';
-import 'package:ifix_tech/core/constants/app_colors.dart';
-import 'package:ifix_tech/core/constants/app_constants.dart';
-import 'package:ifix_tech/core/constants/app_text_styles.dart';
-import 'package:ifix_tech/core/data/repos/common_repo.dart';
-import 'package:ifix_tech/core/routing/app_router.dart';
-import 'package:ifix_tech/core/widgets/ifix_button.dart';
-import 'package:ifix_tech/core/widgets/ifix_card.dart';
-import 'package:ifix_tech/core/widgets/ifix_text_field.dart';
-import 'package:ifix_tech/features/auth/logic/auth_cubit.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/data/repos/common_repo.dart';
+import '../../../../core/routing/app_router.dart';
+import '../../../../core/widgets/ifix_button.dart';
+import '../../../../core/widgets/ifix_card.dart';
+import '../../../../core/widgets/ifix_text_field.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '../../logic/auth_cubit.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -23,97 +23,128 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _nameCtrl = TextEditingController();
-  final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  String? _specialty;
-  int? _selectedCityId;
-  String? _idPhotoPath;
-  String? _avatarPath;
+
+  String? _selectedCityName;
   List<dynamic> _cities = [];
   bool _fetchingCities = true;
-  bool _uploadingId = false;
-  bool _uploadingAvatar = false;
+
+  List<dynamic> _services = [];
+  final List<int> _selectedServiceIds = [];
+  bool _fetchingServices = true;
+
+  String? _idDocumentPath;
+
+  double? _lat;
+  double? _lng;
+  bool _fetchingLocation = false;
+  String? _locationError;
 
   @override
   void initState() {
     super.initState();
     _loadCities();
-  }
-
-  Future<void> _loadCities() async {
-    try {
-      final cities = await CommonRepository().getCities();
-      setState(() {
-        _cities = cities;
-        _fetchingCities = false;
-      });
-    } catch (e) {
-      setState(() => _fetchingCities = false);
-    }
+    _loadServices();
+    _fetchLocation();
   }
 
   @override
   void dispose() {
     _nameCtrl.dispose();
-    _emailCtrl.dispose();
     _phoneCtrl.dispose();
     _passCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _pickAndUploadImage(String type) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile == null) return;
+  Future<void> _loadCities() async {
+    try {
+      final cities = await CommonRepository().getCities();
+      if (mounted) setState(() { _cities = cities; _fetchingCities = false; });
+    } catch (_) {
+      if (mounted) setState(() => _fetchingCities = false);
+    }
+  }
 
-    setState(() {
-      if (type == 'id_photo') _uploadingId = true;
-      if (type == 'avatar') _uploadingAvatar = true;
-    });
+  Future<void> _loadServices() async {
+    try {
+      final services = await CommonRepository().getCategories();
+      if (mounted) setState(() { _services = services; _fetchingServices = false; });
+    } catch (_) {
+      if (mounted) setState(() => _fetchingServices = false);
+    }
+  }
+
+  Future<void> _fetchLocation() async {
+    if (!mounted) return;
+    setState(() { _fetchingLocation = true; _locationError = null; });
 
     try {
-      final dio = await DioFactory.getDio();
-      final formData = FormData.fromMap({
-        'type': type,
-        'document': await MultipartFile.fromFile(pickedFile.path),
-      });
-      final response = await dio.post('documents/upload', data: formData);
-
-      if (response.data['status'] == true) {
-        setState(() {
-          if (type == 'id_photo') _idPhotoPath = response.data['data']['path'];
-          if (type == 'avatar') _avatarPath = response.data['data']['path'];
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.data['message'])));
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) setState(() { _fetchingLocation = false; _locationError = 'location_service_disabled'.tr(); });
+        return;
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('حدث خطأ أثناء الرفع')));
-    } finally {
-      setState(() {
-        if (type == 'id_photo') _uploadingId = false;
-        if (type == 'avatar') _uploadingAvatar = false;
-      });
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        if (mounted) setState(() { _fetchingLocation = false; _locationError = 'location_permission_denied'.tr(); });
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      );
+
+      if (mounted) setState(() { _lat = position.latitude; _lng = position.longitude; _fetchingLocation = false; });
+    } catch (_) {
+      if (mounted) setState(() { _fetchingLocation = false; _locationError = 'تعذّر جلب الموقع'; });
     }
+  }
+
+  Future<void> _pickIdDocument() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked != null && mounted) setState(() => _idDocumentPath = picked.path);
   }
 
   void _onRegister() {
     if (!_formKey.currentState!.validate()) return;
-    if (_specialty == null || _selectedCityId == null || _idPhotoPath == null || _avatarPath == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('يرجى استكمال جميع البيانات ورفع الوثائق', style: TextStyle(fontFamily: 'Cairo'))));
+    if (_selectedCityName == null) {
+      _showSnack('please_select_city'.tr());
       return;
     }
+    if (_selectedServiceIds.isEmpty) {
+      _showSnack('please_select_service'.tr());
+      return;
+    }
+    if (_idDocumentPath == null) {
+      _showSnack('please_upload_id'.tr());
+      return;
+    }
+    if (_lat == null || _lng == null) {
+      _showSnack('please_allow_location'.tr());
+      return;
+    }
+
     context.read<AuthCubit>().register(
-      name: _nameCtrl.text,
-      email: _emailCtrl.text,
-      phone: _phoneCtrl.text,
+      name: _nameCtrl.text.trim(),
+      phone: _phoneCtrl.text.trim(),
       password: _passCtrl.text,
-      cityId: _selectedCityId!,
-      specialty: _specialty!,
-      idPhoto: _idPhotoPath!,
-      avatar: _avatarPath!,
+      city: _selectedCityName!,
+      lat: _lat!,
+      lng: _lng!,
+      idDocumentPath: _idDocumentPath!,
+      serviceIds: _selectedServiceIds,
+    );
+  }
+
+  void _showSnack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg, style: Theme.of(context).textTheme.bodyMedium)),
     );
   }
 
@@ -124,12 +155,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (state is AuthSuccess) {
           context.go(AppRoutes.pendingApproval);
         } else if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message, style: const TextStyle(fontFamily: 'Cairo'))));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message, style: Theme.of(context).textTheme.bodyMedium)),
+          );
         }
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('تسجيل فني جديد'),
+          title: Text('register_new_tech'.tr()),
           leading: IconButton(
             onPressed: () => context.go(AppRoutes.welcome),
             icon: const Icon(Icons.arrow_back_ios_rounded),
@@ -142,118 +175,134 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('انضم إلينا اليوم', style: AppTextStyles.headlineLarge),
+                Text('join_today'.tr(), style: AppTextStyles.headlineLarge),
                 const SizedBox(height: 8),
-                Text('سجل بياناتك وانتظر مراجعة طلبك من قبل الإدارة', style: AppTextStyles.bodyMedium),
+                Text('join_subtitle'.tr(), style: AppTextStyles.bodyMedium),
                 const SizedBox(height: 24),
                 IFixTextField(
-                  hint: 'الاسم الكامل',
-                  label: 'الاسم الكامل',
+                  hint: 'full_name'.tr(),
+                  label: 'full_name'.tr(),
                   controller: _nameCtrl,
                   prefixIcon: const Icon(Icons.person_outline_rounded, size: 20),
-                  validator: (v) => (v?.length ?? 0) < 3 ? 'الاسم قصير جداً' : null,
+                  validator: (v) => (v?.length ?? 0) < 3 ? 'name_too_short'.tr() : null,
                 ),
                 const SizedBox(height: AppConstants.spacingMD),
                 IFixTextField(
-                  hint: 'email@example.com',
-                  label: 'البريد الإلكتروني',
-                  controller: _emailCtrl,
-                  keyboardType: TextInputType.emailAddress,
-                  prefixIcon: const Icon(Icons.email_outlined, size: 20),
-                  validator: (v) => (v?.isEmpty ?? true) ? 'البريد الإلكتروني مطلوب' : null,
-                ),
-                const SizedBox(height: AppConstants.spacingMD),
-                IFixTextField(
-                  hint: '09xxxxxxxx',
-                  label: 'رقم الجوال',
+                  hint: 'phone_hint'.tr(),
+                  label: 'phone'.tr(),
                   controller: _phoneCtrl,
                   keyboardType: TextInputType.phone,
                   prefixIcon: const Icon(Icons.phone_android_rounded, size: 20),
-                  validator: (v) => (v?.length ?? 0) < 9 ? 'رقم جوال غير صالح' : null,
+                  validator: (v) => (v?.length ?? 0) < 9 ? 'invalid_phone'.tr() : null,
                 ),
                 const SizedBox(height: AppConstants.spacingMD),
-                IFixDropdown<String>(
-                  hint: 'التخصص',
-                  value: _specialty,
-                  items: ['مكيفات', 'سباكة', 'كهرباء', 'دهانات', 'نجارة'].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-                  onChanged: (v) => setState(() => _specialty = v),
+                IFixTextField(
+                  hint: 'password_hint'.tr(),
+                  label: 'password'.tr(),
+                  controller: _passCtrl,
+                  obscureText: true,
+                  prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
+                  validator: (v) => (v?.length ?? 0) < 8 ? 'password_short'.tr() : null,
                 ),
                 const SizedBox(height: AppConstants.spacingMD),
                 _fetchingCities
                     ? const Center(child: CircularProgressIndicator())
-                    : IFixDropdown<int>(
-                        hint: 'المدينة',
-                        value: _selectedCityId,
-                        items: _cities.map((c) => DropdownMenuItem<int>(value: c['id'], child: Text(c['name_ar']))).toList(),
-                        onChanged: (v) => setState(() => _selectedCityId = v),
+                    : IFixDropdown<String>(
+                        hint: 'city'.tr(),
+                        value: _selectedCityName,
+                        items: _cities
+                            .map((c) => DropdownMenuItem<String>(value: c['name'].toString(), child: Text(c['name'].toString())))
+                            .toList(),
+                        onChanged: (v) => setState(() => _selectedCityName = v),
                       ),
                 const SizedBox(height: AppConstants.spacingMD),
-                IFixTextField(
-                  hint: 'كلمة المرور',
-                  label: 'كلمة المرور',
-                  controller: _passCtrl,
-                  obscureText: true,
-                  prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
-                  validator: (v) => (v?.length ?? 0) < 6 ? 'كلمة المرور قصيرة' : null,
-                ),
-                const SizedBox(height: 24),
-                const SectionHeader(title: 'الوثائق الثبوتية'),
+                SectionHeader(title: 'services_provided'.tr()),
+                const SizedBox(height: 8),
+                _fetchingServices
+                    ? const Center(child: CircularProgressIndicator())
+                    : Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _services.map((s) {
+                          final id = s['id'] as int;
+                          final name = s['name'].toString();
+                          final selected = _selectedServiceIds.contains(id);
+                          return FilterChip(
+                            label: Text(name),
+                            selected: selected,
+                            onSelected: (v) => setState(() {
+                              if (v) { _selectedServiceIds.add(id); } else { _selectedServiceIds.remove(id); }
+                            }),
+                          );
+                        }).toList(),
+                      ),
+                const SizedBox(height: AppConstants.spacingMD),
+                SectionHeader(title: 'documents'.tr()),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(child: _UploadCard(label: 'صورة الهوية', path: _idPhotoPath, isLoading: _uploadingId, onTap: () => _pickAndUploadImage('id_photo'))),
-                    const SizedBox(width: 12),
-                    Expanded(child: _UploadCard(label: 'الصورة الشخصية', path: _avatarPath, isLoading: _uploadingAvatar, onTap: () => _pickAndUploadImage('avatar'))),
-                  ],
+                IFixCard(
+                  onTap: _pickIdDocument,
+                  child: Row(
+                    children: [
+                      Icon(
+                        _idDocumentPath != null ? Icons.check_circle_rounded : Icons.upload_file_rounded,
+                        color: _idDocumentPath != null ? AppColors.success : AppColors.accent,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _idDocumentPath != null ? 'id_selected'.tr() : 'upload_id'.tr(),
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: _idDocumentPath != null ? AppColors.success : AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppConstants.spacingMD),
+                SectionHeader(title: 'location'.tr()),
+                const SizedBox(height: 12),
+                IFixCard(
+                  onTap: _locationError != null ? _fetchLocation : null,
+                  child: Row(
+                    children: [
+                      if (_fetchingLocation)
+                        const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+                      else
+                        Icon(
+                          _lat != null ? Icons.location_on_rounded : Icons.location_off_rounded,
+                          color: _lat != null ? AppColors.success : (_locationError != null ? AppColors.error : AppColors.accent),
+                        ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _fetchingLocation
+                              ? 'fetching_location'.tr()
+                              : _lat != null
+                                  ? 'location_detected'.tr()
+                                  : _locationError ?? 'fetching_location'.tr(),
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: _lat != null ? AppColors.success : (_locationError != null ? AppColors.error : AppColors.textSecondary),
+                          ),
+                        ),
+                      ),
+                      if (_locationError != null)
+                        Text('retry'.tr(), style: AppTextStyles.labelMedium.copyWith(color: AppColors.accent)),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 32),
                 BlocBuilder<AuthCubit, AuthState>(
-                  builder: (context, state) {
-                    return IFixButton(
-                      label: 'تقديم الطلب',
-                      onTap: _onRegister,
-                      isLoading: state is AuthLoading,
-                    );
-                  },
+                  builder: (context, state) => IFixButton(
+                    label: 'submit_request'.tr(),
+                    onTap: _onRegister,
+                    isLoading: state is AuthLoading,
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _UploadCard extends StatelessWidget {
-  final String label;
-  final String? path;
-  final bool isLoading;
-  final VoidCallback onTap;
-  const _UploadCard({required this.label, this.path, this.isLoading = false, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 120,
-        decoration: BoxDecoration(
-          color: AppColors.surfaceVariant,
-          borderRadius: BorderRadius.circular(AppConstants.radiusLG),
-          border: Border.all(color: path != null ? AppColors.success : AppColors.border, width: path != null ? 1.5 : 0.5),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (isLoading)
-              const CircularProgressIndicator()
-            else
-              Icon(path != null ? Icons.check_circle_rounded : Icons.cloud_upload_outlined, color: path != null ? AppColors.success : AppColors.accent, size: 32),
-            const SizedBox(height: 8),
-            Text(path != null ? 'تم الرفع' : label, style: AppTextStyles.bodySmall.copyWith(color: path != null ? AppColors.success : AppColors.textPrimary)),
-          ],
         ),
       ),
     );

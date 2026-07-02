@@ -1,7 +1,7 @@
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'iFix Pro';
+  static const String appName = 'iFix-Tech';
   static const String appVersion = '1.0.0';
 
   // SharedPreferences keys

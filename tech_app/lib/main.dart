@@ -1,7 +1,7 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/routing/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/logic/auth_cubit.dart';
@@ -9,8 +9,10 @@ import 'features/auth/data/repos/auth_repo.dart';
 import 'features/orders/logic/order_cubit.dart';
 import 'features/orders/data/repos/order_repo.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -21,7 +23,16 @@ void main() {
     systemNavigationBarColor: Color(0xFF0D1117),
     systemNavigationBarIconBrightness: Brightness.light,
   ));
-  runApp(const IFixTechApp());
+
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('ar'),
+      startLocale: const Locale('ar'),
+      child: const IFixTechApp(),
+    ),
+  );
 }
 
 class IFixTechApp extends StatelessWidget {
@@ -35,20 +46,18 @@ class IFixTechApp extends StatelessWidget {
         BlocProvider(create: (context) => OrderCubit(OrderRepository())..getAvailableOrders()),
       ],
       child: MaterialApp.router(
-        title: 'iFix Pro',
+        title: 'iFix-Tech',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
         routerConfig: AppRouter.router,
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
+        locale: context.locale,
+        supportedLocales: context.supportedLocales,
+        localizationsDelegates: context.localizationDelegates,
         builder: (context, child) {
           return Directionality(
-            textDirection: TextDirection.rtl,
+            textDirection: context.locale.languageCode == 'ar'
+                ? TextDirection.rtl
+                : TextDirection.ltr,
             child: child!,
           );
         },

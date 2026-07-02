@@ -66,9 +66,9 @@ class _UploadReceiptScreenState extends State<UploadReceiptScreen> {
                 children: [
                   Text('بيانات الحساب البنكي للتطبيق:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, fontFamily: 'Cairo')),
                   SizedBox(height: 8),
-                  Text('بنك الراجحي', style: TextStyle(fontFamily: 'Cairo', fontSize: 13)),
-                  Text('IBAN: SA12 3456 7890 1234 5678 9012', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  Text('باسم: مؤسسة آي فيكس لتقنية المعلومات', style: TextStyle(fontFamily: 'Cairo', fontSize: 13)),
+                  Text('بنك الشام (Cham Bank)', style: TextStyle(fontFamily: 'Cairo', fontSize: 13)),
+                  Text('IBAN: SY12 0011 2233 4455 6677 8899', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text('باسم: شركة آي فيكس لخدمات الصيانة والتقنية', style: TextStyle(fontFamily: 'Cairo', fontSize: 13)),
                 ],
               ),
             ),

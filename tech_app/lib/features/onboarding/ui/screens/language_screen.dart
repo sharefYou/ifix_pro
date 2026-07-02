@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,7 +38,11 @@ class _LanguageScreenState extends State<LanguageScreen>
   Future<void> _onContinue() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(AppConstants.keyLanguage, _selected);
-    if (mounted) context.go(AppRoutes.welcome);
+    if (mounted) {
+      await context.setLocale(Locale(_selected));
+      if (!mounted) return;
+      context.go(AppRoutes.welcome);
+    }
   }
 
   @override
@@ -141,7 +146,7 @@ class _LanguageScreenState extends State<LanguageScreen>
         ),
         const SizedBox(height: 12),
         Text(
-          'iFix Pro',
+          'iFix-Tech',
           style: AppTextStyles.displayLarge.copyWith(
             foreground: Paint()
               ..shader = const LinearGradient(

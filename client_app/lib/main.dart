@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ifix_client/core/api/dio_helper.dart';
+import 'package:ifix_client/core/theme/app_theme.dart';
 import 'package:ifix_client/core/helpers/bloc_observer.dart';
 import 'package:ifix_client/core/helpers/cache_helper.dart';
 import 'package:ifix_client/features/custom_requests/manager/custom_requests_cubit.dart';
@@ -14,10 +16,21 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
   DioHelper.initialDio();
   await CacheHelper.init();
   Bloc.observer = MyBlocObserver();
-  runApp(MyApp());
+
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('ar'),
+      startLocale: const Locale('ar'),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -34,11 +47,18 @@ class MyApp extends StatelessWidget {
         BlocProvider<CustomRequestsCubit>(create: (_) => CustomRequestsCubit()),
       ],
       child: MaterialApp(
+        title: 'iFix',
         home: SplashScreen(),
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
+        locale: context.locale,
+        supportedLocales: context.supportedLocales,
+        localizationsDelegates: context.localizationDelegates,
+        theme: AppTheme.darkTheme,
         builder: (context, child) => Directionality(
-          textDirection: TextDirection.rtl,
+          textDirection: context.locale.languageCode == 'ar'
+              ? TextDirection.rtl
+              : TextDirection.ltr,
           child: child!,
         ),
       ),

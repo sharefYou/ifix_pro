@@ -121,7 +121,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: category.icon != null
-                  ? Image.network(category.icon!, width: 28, height: 28, errorBuilder: (_, __, ___) => const Icon(Icons.category_outlined, color: tertiaryColor, size: 28))
+                  ? Image.network(category.icon!, width: 28, height: 28, errorBuilder: (_, _, _) => const Icon(Icons.category_outlined, color: tertiaryColor, size: 28))
                   : const Icon(Icons.category_outlined, color: tertiaryColor, size: 28),
             ),
             const Spacer(),

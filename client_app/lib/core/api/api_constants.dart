@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseURL = 'http://10.0.2.2:8001';
+  static const String baseURL = 'https://sharef.alwaysdata.net';
 
   // Auth Endpoints
   static const String login = '/api/v1/customer/login';
