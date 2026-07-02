@@ -71,7 +71,8 @@ Route::prefix('v1/technician')->middleware([\App\Http\Middleware\SetLocale::clas
             Route::post('/{order}/status', [\App\Http\Controllers\Api\V1\Technician\OrderController::class, 'updateStatus']);
         });
 
-        Route::post('/tracking/broadcast', [\App\Http\Controllers\Api\V1\Technician\TrackingController::class, 'updateLocation'])->middleware('throttle:60,1');
+        Route::post('/tracking/location', [\App\Http\Controllers\Api\V1\Technician\TrackingController::class, 'updateLocation'])->middleware('throttle:30,1');
+        Route::post('/tracking/broadcast', [\App\Http\Controllers\Api\V1\Technician\TrackingController::class, 'broadcastLocation'])->middleware('throttle:60,1');
 
         Route::prefix('custom-requests')->group(function () {
             Route::get('/available', [\App\Http\Controllers\Api\V1\Technician\CustomRequestController::class, 'available']);

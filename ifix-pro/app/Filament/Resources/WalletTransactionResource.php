@@ -16,38 +16,61 @@ class WalletTransactionResource extends Resource
 {
     protected static ?string $model = WalletTransaction::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-currency-dollar';
-    protected static string|\UnitEnum|null $navigationGroup = 'Financials';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.group_financials');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.wallet_transactions');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.wallet_transaction');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.wallet_transactions');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             Select::make('user_id')
+                ->label(__('admin.used_by'))
                 ->relationship('user', 'name')
                 ->required(),
-            TextInput::make('amount')->numeric()->required(),
-            TextInput::make('type')->required(),
-            TextInput::make('status')->required(),
+            TextInput::make('amount')->label(__('admin.amount'))->numeric()->required(),
+            TextInput::make('type')->label(__('admin.type'))->required(),
+            TextInput::make('status')->label(__('admin.status'))->required(),
         ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table->columns([
-            TextColumn::make('user.name')->searchable(),
-            TextColumn::make('amount')->money(),
-            TextColumn::make('type'),
+            TextColumn::make('user.name')->label(__('admin.used_by'))->searchable(),
+            TextColumn::make('amount')->label(__('admin.amount'))->money(),
+            TextColumn::make('type')->label(__('admin.type')),
             TextColumn::make('status')
+                ->label(__('admin.status'))
                 ->badge()
+                ->formatStateUsing(fn (string $state): string => __('admin.status_' . $state))
                 ->color(fn (string $state): string => match ($state) {
                     'pending' => 'warning',
                     'completed' => 'success',
                     'rejected' => 'danger',
                     default => 'gray',
                 }),
-            TextColumn::make('created_at')->dateTime(),
+            TextColumn::make('created_at')->label(__('admin.created_at'))->dateTime(),
         ])
         ->actions([
             Action::make('Approve')
+                ->label(__('admin.approve'))
                 ->requiresConfirmation()
                 ->color('success')
                 ->visible(fn (WalletTransaction $record): bool => $record->status === 'pending')
@@ -57,6 +80,7 @@ class WalletTransactionResource extends Resource
                     $record->update(['status' => 'completed']);
                 }),
             Action::make('Reject')
+                ->label(__('admin.reject'))
                 ->requiresConfirmation()
                 ->color('danger')
                 ->visible(fn (WalletTransaction $record): bool => $record->status === 'pending')

@@ -14,11 +14,12 @@ class UpdateTechnicianProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'string', 'max:255'],
-            'city' => ['sometimes', 'string'],
-            'avatar' => ['sometimes', 'image', 'max:2048'],
+            'name'        => ['sometimes', 'string', 'max:255'],
+            'city'        => ['sometimes', 'string'],
+            'avatar'      => ['sometimes', 'image', 'max:2048'],
             'service_ids' => ['sometimes', 'array', 'min:1'],
             'service_ids.*' => ['exists:services,id'],
+            'fcm_token'   => ['sometimes', 'nullable', 'string', 'max:512'],
         ];
     }
 }

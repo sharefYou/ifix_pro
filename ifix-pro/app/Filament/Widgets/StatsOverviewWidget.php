@@ -14,18 +14,18 @@ class StatsOverviewWidget extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Total Users', User::count())
-                ->description('Active customers & technicians')
+            Stat::make(__('admin.total_users'), User::count())
+                ->description(__('admin.active_customers_techs'))
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('success'),
             
-            Stat::make('Admins', User::where('is_admin', true)->count())
-                ->description('System administrators')
+            Stat::make(__('admin.admins'), User::where('is_admin', true)->count())
+                ->description(__('admin.system_admins'))
                 ->descriptionIcon('heroicon-m-shield-check')
                 ->color('warning'),
                 
-            Stat::make('Total Services', Service::count())
-                ->description('Available services')
+            Stat::make(__('admin.total_services'), Service::count())
+                ->description(__('admin.available_services'))
                 ->descriptionIcon('heroicon-m-wrench')
                 ->color('info'),
         ];

@@ -16,36 +16,57 @@ class ContactMessageResource extends Resource
 {
     protected static ?string $model = ContactMessage::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
-    protected static string|\UnitEnum|null $navigationGroup = 'General';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.group_general');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.contact_messages');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.contact_message');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.contact_messages');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('name')->disabled(),
-            TextInput::make('phone')->disabled(),
-            TextInput::make('email')->disabled(),
-            TextInput::make('subject')->disabled(),
-            Textarea::make('message')->disabled()->columnSpanFull(),
+            TextInput::make('name')->label(__('admin.sender_name'))->disabled(),
+            TextInput::make('phone')->label(__('admin.phone'))->disabled(),
+            TextInput::make('email')->label(__('admin.email'))->disabled(),
+            TextInput::make('subject')->label(__('admin.subject'))->disabled(),
+            Textarea::make('message')->label(__('admin.message'))->disabled()->columnSpanFull(),
         ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table->columns([
-            TextColumn::make('name')->searchable(),
-            TextColumn::make('subject')->searchable(),
+            TextColumn::make('name')->label(__('admin.sender_name'))->searchable(),
+            TextColumn::make('subject')->label(__('admin.subject'))->searchable(),
             IconColumn::make('is_read')
+                ->label(__('admin.is_read'))
                 ->boolean()
                 ->trueIcon('heroicon-o-check-circle')
                 ->falseIcon('heroicon-o-envelope')
                 ->trueColor('success')
                 ->falseColor('warning'),
-            TextColumn::make('created_at')->dateTime()->sortable(),
+            TextColumn::make('created_at')->label(__('admin.created_at'))->dateTime()->sortable(),
         ])
         ->defaultSort('created_at', 'desc')
         ->actions([
             \Filament\Actions\ViewAction::make(),
             Action::make('markAsRead')
+                ->label(__('admin.mark_as_read'))
                 ->icon('heroicon-m-check')
                 ->color('success')
                 ->visible(fn (ContactMessage $record) => !$record->is_read)

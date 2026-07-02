@@ -16,7 +16,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 
-#[Fillable(['name', 'phone', 'email', 'password', 'city', 'lat', 'lng', 'avatar', 'fcm_token', 'otp_code', 'otp_expires_at', 'phone_verified_at', 'is_technician', 'is_verified', 'is_online', 'id_document_path', 'is_admin', 'is_active'])]
+#[Fillable(['name', 'phone', 'email', 'password', 'city', 'lat', 'lng', 'avatar', 'fcm_token', 'otp_code', 'otp_expires_at', 'phone_verified_at', 'is_technician', 'is_verified', 'is_online', 'id_document_path', 'is_admin', 'is_active', 'last_seen_at'])]
 #[Hidden(['password', 'remember_token', 'otp_code'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -34,6 +34,7 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'phone_verified_at' => 'datetime',
             'otp_expires_at' => 'datetime',
+            'last_seen_at' => 'datetime',
             'password' => 'hashed',
             'is_technician' => 'boolean',
             'is_verified' => 'boolean',

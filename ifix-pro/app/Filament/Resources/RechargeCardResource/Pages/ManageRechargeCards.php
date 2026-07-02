@@ -19,12 +19,12 @@ class ManageRechargeCards extends ManageRecords
     {
         return [
             Action::make('generateBatch')
-                ->label('توليد بطاقات جديدة')
+                ->label(__('admin.generate_batch'))
                 ->icon('heroicon-o-plus-circle')
                 ->color('primary')
                 ->form([
                     Select::make('amount')
-                        ->label('فئة البطاقة')
+                        ->label(__('admin.card_denomination'))
                         ->options([
                             100 => '100',
                             200 => '200',
@@ -39,14 +39,14 @@ class ManageRechargeCards extends ManageRecords
                         ])
                         ->required(),
                     TextInput::make('count')
-                        ->label('عدد البطاقات')
+                        ->label(__('admin.cards_count'))
                         ->numeric()
                         ->default(10)
                         ->minValue(1)
                         ->maxValue(500)
                         ->required(),
                     DatePicker::make('expires_at')
-                        ->label('تاريخ انتهاء الصلاحية')
+                        ->label(__('admin.expires_at'))
                         ->default(now()->addMonths(6))
                         ->required(),
                 ])
@@ -79,8 +79,8 @@ class ManageRechargeCards extends ManageRecords
                     RechargeCard::insert($cards);
 
                     Notification::make()
-                        ->title('تم التوليد بنجاح')
-                        ->body("تم توليد $count بطاقة بفئة $amount")
+                        ->title(__('admin.generated_successfully'))
+                        ->body(__('admin.generated_body', ['count' => $count, 'amount' => $amount]))
                         ->success()
                         ->send();
                 }),

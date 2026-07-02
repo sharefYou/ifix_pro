@@ -14,19 +14,38 @@ class PageResource extends Resource
 {
     protected static ?string $model = Page::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
-    protected static string|\UnitEnum|null $navigationGroup = 'General';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.group_general');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.pages');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.page');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.pages');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('slug')->unique(ignoreRecord: true)->required(),
-            TextInput::make('title.en')->label('Title (EN)')->required()
+            TextInput::make('slug')->label(__('admin.slug'))->unique(ignoreRecord: true)->required(),
+            TextInput::make('title.en')->label(__('admin.title_en'))->required()
                 ->formatStateUsing(fn (?Page $record): ?string => $record?->getTranslation('title', 'en', false)),
-            TextInput::make('title.ar')->label('Title (AR)')->required()
+            TextInput::make('title.ar')->label(__('admin.title_ar'))->required()
                 ->formatStateUsing(fn (?Page $record): ?string => $record?->getTranslation('title', 'ar', false)),
-            RichEditor::make('content.en')->label('Content (EN)')->required()
+            RichEditor::make('content.en')->label(__('admin.content_en'))->required()
                 ->formatStateUsing(fn (?Page $record): ?string => $record?->getTranslation('content', 'en', false)),
-            RichEditor::make('content.ar')->label('Content (AR)')->required()
+            RichEditor::make('content.ar')->label(__('admin.content_ar'))->required()
                 ->formatStateUsing(fn (?Page $record): ?string => $record?->getTranslation('content', 'ar', false)),
         ])->columns(1);
     }
@@ -34,11 +53,11 @@ class PageResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->columns([
-            TextColumn::make('title_en')->label('Title (EN)')
+            TextColumn::make('title_en')->label(__('admin.title_en'))
                 ->getStateUsing(fn (Page $record): ?string => $record->getTranslation('title', 'en', false))
                 ->searchable(query: fn ($query, $search) => $query->where('title->en', 'like', "%{$search}%")),
-            TextColumn::make('slug')->searchable(),
-            TextColumn::make('updated_at')->dateTime(),
+            TextColumn::make('slug')->label(__('admin.slug'))->searchable(),
+            TextColumn::make('updated_at')->label(__('admin.updated_at'))->dateTime(),
         ])
         ->actions([
             \Filament\Actions\EditAction::make(),

@@ -13,7 +13,26 @@ class RechargeCardResource extends Resource
 {
     protected static ?string $model = RechargeCard::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
-    protected static string|\UnitEnum|null $navigationGroup = 'Financials';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.group_financials');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.recharge_cards');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.recharge_card');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.recharge_cards');
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -23,13 +42,13 @@ class RechargeCardResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->columns([
-            TextColumn::make('code')->label('رقم البطاقة')->searchable()->copyable(),
-            TextColumn::make('amount')->label('الفئة')->sortable(),
-            TextColumn::make('expires_at')->label('تاريخ الانتهاء')->date()->sortable(),
-            IconColumn::make('is_used')->label('مستخدمة')->boolean(),
-            TextColumn::make('user.name')->label('المستخدم')->placeholder('-'),
-            TextColumn::make('used_at')->label('وقت الاستخدام')->dateTime()->placeholder('-'),
-            TextColumn::make('created_at')->label('تاريخ التوليد')->dateTime()->sortable(),
+            TextColumn::make('code')->label(__('admin.card_code'))->searchable()->copyable(),
+            TextColumn::make('amount')->label(__('admin.card_amount'))->sortable(),
+            TextColumn::make('expires_at')->label(__('admin.expires_at'))->date()->sortable(),
+            IconColumn::make('is_used')->label(__('admin.is_used'))->boolean(),
+            TextColumn::make('user.name')->label(__('admin.used_by'))->placeholder('-'),
+            TextColumn::make('used_at')->label(__('admin.used_at'))->dateTime()->placeholder('-'),
+            TextColumn::make('created_at')->label(__('admin.created_at'))->dateTime()->sortable(),
         ])
         ->defaultSort('created_at', 'desc')
         ->actions([

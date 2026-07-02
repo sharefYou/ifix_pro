@@ -19,10 +19,22 @@ class ManageTheme extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-paint-brush';
-    protected static string|\UnitEnum|null $navigationGroup = 'Settings';
-    protected static ?string $navigationLabel = 'Theme Settings';
-    protected static ?string $title = 'Manage Theme';
     protected static ?int $navigationSort = 100;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.group_settings');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.theme_settings');
+    }
+
+    public function getTitle(): string
+    {
+        return __('admin.manage_theme');
+    }
 
     protected string $view = 'filament.pages.manage-theme';
 
@@ -38,26 +50,26 @@ class ManageTheme extends Page implements HasForms
     {
         return $schema
             ->components([
-                Section::make('Branding')
+                Section::make(fn() => __('admin.branding'))
                     ->components([
                         TextInput::make('brand_name')
-                            ->label('Brand Name')
+                            ->label(__('admin.brand_name'))
                             ->required()
                             ->maxLength(255),
                         FileUpload::make('logo_image')
-                            ->label('Logo Image')
+                            ->label(__('admin.logo_image'))
                             ->image()
                             ->directory('settings')
                             ->maxSize(2048),
                     ])->columns(2),
 
-                Section::make('Appearance')
+                Section::make(fn() => __('admin.appearance'))
                     ->components([
                         ColorPicker::make('primary_color')
-                            ->label('Primary Color (Hex)')
+                            ->label(__('admin.primary_color'))
                             ->required(),
                         Select::make('font_family')
-                            ->label('Font Family')
+                            ->label(__('admin.font_family'))
                             ->options([
                                 'Cairo' => 'Cairo',
                                 'Tajawal' => 'Tajawal',
@@ -78,7 +90,7 @@ class ManageTheme extends Page implements HasForms
         $theme->save();
 
         Notification::make()
-            ->title('Theme settings saved successfully')
+            ->title(__('admin.theme_saved'))
             ->success()
             ->send();
     }

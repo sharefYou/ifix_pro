@@ -18,27 +18,48 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
-    protected static string|\UnitEnum|null $navigationGroup = 'User Management';
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.group_user_management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.users');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.user');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.users');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             \Filament\Forms\Components\FileUpload::make('avatar')
+                ->label(__('admin.avatar'))
                 ->avatar()
                 ->directory('avatars')
                 ->maxSize(2048)
                 ->columnSpanFull(),
-            TextInput::make('name')->required(),
-            TextInput::make('phone')->required()->unique(ignoreRecord: true),
-            TextInput::make('email')->email()->unique(ignoreRecord: true),
-            TextInput::make('password')->password()->dehydrated(fn ($state) => filled($state))->required(fn (string $context): bool => $context === 'create'),
-            DateTimePicker::make('phone_verified_at'),
+            TextInput::make('name')->label(__('admin.sender_name'))->required(),
+            TextInput::make('phone')->label(__('admin.phone'))->required()->unique(ignoreRecord: true),
+            TextInput::make('email')->label(__('admin.email'))->email()->unique(ignoreRecord: true),
+            TextInput::make('password')->label(__('admin.password'))->password()->dehydrated(fn ($state) => filled($state))->required(fn (string $context): bool => $context === 'create'),
+            DateTimePicker::make('phone_verified_at')->label(__('admin.phone_verified_at')),
             Select::make('account_type')
+                ->label(__('admin.account_type'))
                 ->options([
-                    'admin' => 'Admin',
-                    'technician' => 'Technician',
-                    'customer' => 'Customer',
+                    'admin' => __('admin.type_admin'),
+                    'technician' => __('admin.type_technician'),
+                    'customer' => __('admin.type_customer'),
                 ])
                 ->dehydrated(true)
                 ->afterStateHydrated(function ($component, ?User $record) {
@@ -48,19 +69,19 @@ class UserResource extends Resource
                     else $component->state('customer');
                 })
                 ->required(),
-            Toggle::make('is_active')->label('Active')->default(true),
+            Toggle::make('is_active')->label(__('admin.is_active'))->default(true),
         ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table->columns([
-            \Filament\Tables\Columns\ImageColumn::make('avatar')->circular(),
-            TextColumn::make('name')->searchable(),
-            TextColumn::make('phone')->searchable(),
-            TextColumn::make('email')->searchable(),
-            ToggleColumn::make('is_active')->label('Active/Suspended'),
-            TextColumn::make('created_at')->dateTime(),
+            \Filament\Tables\Columns\ImageColumn::make('avatar')->label(__('admin.avatar'))->circular(),
+            TextColumn::make('name')->label(__('admin.sender_name'))->searchable(),
+            TextColumn::make('phone')->label(__('admin.phone'))->searchable(),
+            TextColumn::make('email')->label(__('admin.email'))->searchable(),
+            ToggleColumn::make('is_active')->label(__('admin.active_suspended')),
+            TextColumn::make('created_at')->label(__('admin.created_at'))->dateTime(),
         ])
         ->actions([
             \Filament\Actions\EditAction::make()

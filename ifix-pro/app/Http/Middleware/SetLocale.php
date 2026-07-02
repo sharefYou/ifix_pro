@@ -10,12 +10,8 @@ class SetLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->hasHeader('Accept-Language')) {
-            $locale = substr($request->header('Accept-Language'), 0, 2);
-            if (in_array($locale, ['en', 'ar'])) {
-                app()->setLocale($locale);
-            }
-        }
+        $locale = session('locale', config('app.locale', 'ar'));
+        app()->setLocale($locale);
 
         return $next($request);
     }
