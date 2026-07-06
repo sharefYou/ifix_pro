@@ -41,7 +41,33 @@ class AuthCubit extends Cubit<AuthState> {
         idDocumentPath: idDocumentPath,
         serviceIds: serviceIds,
       );
-      emit(AuthSuccess(response));
+      emit(OtpSentSuccess(
+        response['message']?.toString() ?? 'OTP Sent',
+        response['otp']?.toString(),
+      ));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> verifyOtp(String phone, String otpCode) async {
+    emit(AuthLoading());
+    try {
+      final response = await _repo.verifyOtp(phone, otpCode);
+      emit(OtpVerifiedSuccess(response));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> resendOtp(String phone) async {
+    emit(AuthLoading());
+    try {
+      final response = await _repo.resendOtp(phone);
+      emit(OtpSentSuccess(
+        response['message']?.toString() ?? 'OTP Sent',
+        response['otp']?.toString(),
+      ));
     } catch (e) {
       emit(AuthError(e.toString()));
     }

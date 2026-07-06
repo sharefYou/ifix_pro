@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ifix_client/core/helpers/extensions.dart';
 import 'package:ifix_client/features/auth/manager/auth_cubit.dart';
@@ -15,11 +15,11 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  static const Color backgroundColor = Color(0xFFFAF5EE);
-  static const Color borderColor = Color(0xFFD8D0C8);
+  static const Color backgroundColor = Color(0xFF0D1117);
+  static const Color borderColor = Color(0xFF30363D);
   static const Color surfaceColor = Colors.white;
   static const Color shadowColor = Color(0x0A3A302A);
-  static const Color textColor = Color(0xFF3A302A);
+  static const Color textColor = Color(0xFFF0F6FC);
 
   final phoneController = TextEditingController();
 
@@ -160,3 +160,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 }
+
+
+

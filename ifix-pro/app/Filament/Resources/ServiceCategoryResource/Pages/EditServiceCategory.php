@@ -3,16 +3,17 @@
 namespace App\Filament\Resources\ServiceCategoryResource\Pages;
 
 use App\Filament\Resources\ServiceCategoryResource;
-use Filament\Resources\Pages\ManageRecords;
+use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
-class ManageServiceCategories extends ManageRecords
+class EditServiceCategory extends EditRecord
 {
     protected static string $resource = ServiceCategoryResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\CreateAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
 }

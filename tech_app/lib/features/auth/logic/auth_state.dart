@@ -24,3 +24,21 @@ class AuthError extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+
+class OtpSentSuccess extends AuthState {
+  final String message;
+  final String? devOtp;
+  OtpSentSuccess(this.message, [this.devOtp]);
+
+  @override
+  List<Object?> get props => [message, devOtp];
+}
+
+class OtpVerifiedSuccess extends AuthState {
+  final Map<String, dynamic> data;
+  OtpVerifiedSuccess(this.data);
+
+  @override
+  List<Object?> get props => [data];
+}
+

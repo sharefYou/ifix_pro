@@ -13,10 +13,10 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
-  static const Color backgroundColor = Color(0xFFFAF5EE);
-  static const Color tertiaryColor = Color(0xFF8C3C3C);
-  static const Color borderColor = Color(0xFFD8D0C8);
-  static const Color textColor = Color(0xFF3A302A);
+  static const Color backgroundColor = Color(0xFF0D1117);
+  static const Color tertiaryColor = Color(0xFF2979FF);
+  static const Color borderColor = Color(0xFF30363D);
+  static const Color textColor = Color(0xFFF0F6FC);
 
   @override
   void initState() {
@@ -70,7 +70,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFF3A302A), Color(0xFF5A4D44)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                      gradient: const LinearGradient(colors: [Color(0xFFF0F6FC), Color(0xFF5A4D44)], begin: Alignment.topLeft, end: Alignment.bottomRight),
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [BoxShadow(color: textColor.withValues(alpha: 0.2), blurRadius: 15, offset: const Offset(0, 8))],
                     ),
@@ -87,7 +87,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         const SizedBox(height: 12),
                         Text(
                           '${wallet.availableBalance} ريال',
-                          style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+                          style: const TextStyle(color: Color(0xFF161B22), fontSize: 32, fontWeight: FontWeight.bold),
                         ),
                         if (wallet.heldBalance > 0) ...[
                           const SizedBox(height: 12),
@@ -107,7 +107,7 @@ class _WalletScreenState extends State<WalletScreen> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             ),
                             icon: const Icon(Icons.add, color: Colors.white),
-                            label: const Text('شحن المحفظة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                            label: const Text('شحن المحفظة', style: TextStyle(color: Color(0xFF161B22), fontWeight: FontWeight.bold, fontSize: 16)),
                             onPressed: () {
                               showDialog(
                                 context: context,
@@ -143,7 +143,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         return Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: const Color(0xFF161B22),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: borderColor),
                           ),
@@ -199,3 +199,6 @@ class _WalletScreenState extends State<WalletScreen> {
     }
   }
 }
+
+
+

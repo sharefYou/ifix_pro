@@ -1,4 +1,4 @@
-class AssetsManager {
+﻿class AssetsManager {
   static const String kLoginBoxChartImage = 'assets/images/login_box_chart.png';
   static const String kLogoImage = 'assets/images/logo.png';
   static const String kLoginIcon = 'assets/icons/login_icon.svg';
@@ -63,3 +63,6 @@ class AssetsManager {
   static const String kLoadingLottie = 'assets/icons/loading.json';
 
 }
+
+
+

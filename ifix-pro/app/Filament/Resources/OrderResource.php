@@ -66,15 +66,21 @@ class OrderResource extends Resource
             TextColumn::make('status')
                 ->label(__('admin.status'))
                 ->badge()
-                ->formatStateUsing(fn (string $state): string => __('admin.status_' . $state))
-                ->color(fn (string $state): string => match ($state) {
-                    'pending_tech' => 'warning',
-                    'accepted' => 'info',
-                    'on_the_way' => 'primary',
-                    'in_progress' => 'primary',
-                    'completed' => 'success',
-                    'canceled' => 'danger',
-                    default => 'gray',
+                ->formatStateUsing(function ($state): string {
+                    $val = $state instanceof \BackedEnum ? $state->value : (string) $state;
+                    return __('admin.status_' . $val);
+                })
+                ->color(function ($state): string {
+                    $val = $state instanceof \BackedEnum ? $state->value : (string) $state;
+                    return match ($val) {
+                        'pending_tech' => 'warning',
+                        'accepted' => 'info',
+                        'on_the_way' => 'primary',
+                        'in_progress' => 'primary',
+                        'completed' => 'success',
+                        'canceled' => 'danger',
+                        default => 'gray',
+                    };
                 }),
             TextColumn::make('total_amount')->label(__('admin.total_amount'))->money(),
             TextColumn::make('visit_date')->label(__('admin.visit_date'))->dateTime(),

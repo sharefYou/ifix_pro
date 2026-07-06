@@ -23,10 +23,15 @@ class CustomRequestController extends Controller
 
     public function index(): JsonResponse
     {
-        $requests = CustomRequest::where('user_id', auth()->id())->latest()->get();
+        $requests = CustomRequest::where('user_id', auth()->id())->latest()->paginate(20);
 
         return response()->json([
-            'data' => CustomRequestResource::collection($requests),
+            'data' => CustomRequestResource::collection($requests->items()),
+            'meta' => [
+                'current_page' => $requests->currentPage(),
+                'last_page' => $requests->lastPage(),
+                'total' => $requests->total(),
+            ],
         ]);
     }
 
@@ -39,6 +44,8 @@ class CustomRequestController extends Controller
             'description' => $data['description'],
             'visit_date' => $data['visit_date'],
             'status' => 'pending',
+            'audio_memo_path' => $data['audio_memo_path'] ?? null,
+            'video_path' => $data['video_path'] ?? null,
         ]);
 
         if ($request->hasFile('images')) {
@@ -49,6 +56,8 @@ class CustomRequestController extends Controller
                 ]);
             }
         }
+
+        broadcast(new \App\Events\CustomRequestCreated($customRequest))->toOthers();
 
         return response()->json([
             'message' => __('messages.custom_request_created'),
@@ -62,10 +71,15 @@ class CustomRequestController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $bids = $customRequest->bids()->with('technician')->get();
+        $bids = $customRequest->bids()->with('technician')->paginate(20);
 
         return response()->json([
-            'data' => BidResource::collection($bids),
+            'data' => BidResource::collection($bids->items()),
+            'meta' => [
+                'current_page' => $bids->currentPage(),
+                'last_page' => $bids->lastPage(),
+                'total' => $bids->total(),
+            ],
         ]);
     }
 
@@ -108,8 +122,58 @@ class CustomRequestController extends Controller
             ]);
         });
 
+        broadcast(new \App\Events\BidUpdated($bid, (string) $bid->technician_id))->toOthers();
+
         return response()->json([
             'message' => __('messages.bid_accepted'),
         ]);
+    }
+
+    public function counterOffer(\Illuminate\Http\Request $request, CustomRequest $customRequest, Bid $bid): JsonResponse
+    {
+        if ($customRequest->user_id !== auth()->id() || $bid->custom_request_id !== $customRequest->id) {
+            return response()->json(['message' => 'Unauthorized or Invalid Bid'], 403);
+        }
+
+        if ($customRequest->status !== 'pending' || $bid->status !== 'pending') {
+            return response()->json(['message' => 'Bid cannot be countered in current status'], 400);
+        }
+
+        $validated = $request->validate([
+            'counter_price' => ['required', 'numeric', 'min:0'],
+            'counter_notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $bid->update([
+            'counter_price' => $validated['counter_price'],
+            'counter_notes' => $validated['counter_notes'] ?? null,
+            'counter_by' => 'customer',
+            'counter_status' => 'pending',
+        ]);
+
+        broadcast(new \App\Events\BidUpdated($bid, (string) $bid->technician_id))->toOthers();
+
+        return response()->json([
+            'message' => 'Counter-offer submitted successfully',
+            'data' => $bid,
+        ]);
+    }
+
+    public function acceptCounterOffer(AcceptBidRequest $request, CustomRequest $customRequest, Bid $bid): JsonResponse
+    {
+        if ($customRequest->user_id !== auth()->id() || $bid->custom_request_id !== $customRequest->id) {
+            return response()->json(['message' => 'Unauthorized or Invalid Bid'], 403);
+        }
+
+        if ($customRequest->status !== 'pending' || $bid->status !== 'pending' || $bid->counter_by !== 'technician' || $bid->counter_status !== 'pending') {
+            return response()->json(['message' => 'No valid technician counter-offer to accept'], 400);
+        }
+
+        $bid->update([
+            'price' => $bid->counter_price,
+            'counter_status' => 'accepted',
+        ]);
+
+        return $this->acceptBid($request, $customRequest, $bid);
     }
 }

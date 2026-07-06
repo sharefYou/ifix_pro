@@ -54,6 +54,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Order::class);
     }
 
+    public function technicianOrders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'technician_id');
+    }
+
     public function customRequests(): HasMany
     {
         return $this->hasMany(CustomRequest::class);
@@ -62,6 +67,11 @@ class User extends Authenticatable implements FilamentUser
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function technicianReviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'technician_id');
     }
 
     public function services(): \Illuminate\Database\Eloquent\Relations\BelongsToMany

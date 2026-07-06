@@ -8,6 +8,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
+use App\Filament\Resources\ServiceCategoryResource\Pages;
+use App\Filament\Resources\ServiceCategoryResource\RelationManagers;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -75,15 +77,29 @@ class ServiceCategoryResource extends Resource
                 ->searchable(query: fn ($query, $search) => $query->where('name->ar', 'like', "%{$search}%")),
         ])
         ->actions([
+            \Filament\Actions\Action::make('manage_services')
+                ->label(__('admin.manage_services'))
+                ->icon('heroicon-o-wrench')
+                ->color('primary')
+                ->url(fn (ServiceCategory $record): string => static::getUrl('edit', ['record' => $record])),
             \Filament\Actions\EditAction::make(),
             \Filament\Actions\DeleteAction::make(),
         ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\ServicesRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
-            'index' => \App\Filament\Resources\ServiceCategoryResource\Pages\ManageServiceCategories::route('/'),
+            'index' => Pages\ListServiceCategories::route('/'),
+            'create' => Pages\CreateServiceCategory::route('/create'),
+            'edit' => Pages\EditServiceCategory::route('/{record}/edit'),
         ];
     }
 }

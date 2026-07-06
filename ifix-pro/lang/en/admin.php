@@ -156,4 +156,10 @@ return [
     'all_time_orders' => 'All time orders',
     'total_pending_topups' => 'Total Pending Top-ups',
     'awaiting_approval' => 'Awaiting approval',
+
+    // Added recently
+    'manage_services' => 'Manage Services',
+    'add_service' => 'Add New Service',
+    'all' => 'All',
+    'currency' => 'Currency',
 ];

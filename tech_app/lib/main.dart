@@ -8,6 +8,10 @@ import 'features/auth/logic/auth_cubit.dart';
 import 'features/auth/data/repos/auth_repo.dart';
 import 'features/orders/logic/order_cubit.dart';
 import 'features/orders/data/repos/order_repo.dart';
+import 'features/custom_orders/logic/custom_orders_cubit.dart';
+import 'features/custom_orders/data/repos/custom_orders_repo.dart';
+import 'features/analytics/logic/analytics_cubit.dart';
+import 'features/analytics/data/repos/analytics_repo.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +48,8 @@ class IFixTechApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => AuthCubit(AuthRepository())),
         BlocProvider(create: (context) => OrderCubit(OrderRepository())..getAvailableOrders()),
+        BlocProvider(create: (context) => CustomOrdersCubit(CustomOrdersRepository())..loadData()),
+        BlocProvider(create: (context) => AnalyticsCubit(AnalyticsRepo())),
       ],
       child: MaterialApp.router(
         title: 'iFix-Tech',

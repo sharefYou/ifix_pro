@@ -6,7 +6,10 @@ use App\Http\Controllers\Api\V1\Customer\ServiceController;
 use App\Http\Controllers\Api\V1\Customer\WalletController;
 use App\Http\Controllers\Api\V1\Customer\OrderController;
 use App\Http\Controllers\Api\V1\Technician\TrackingController;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
+
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 Route::prefix('v1/general')->middleware([\App\Http\Middleware\SetLocale::class])->group(function () {
     Route::get('/cities', [\App\Http\Controllers\Api\V1\General\GeneralController::class, 'cities']);
@@ -14,7 +17,21 @@ Route::prefix('v1/general')->middleware([\App\Http\Middleware\SetLocale::class])
     Route::get('/pages/{slug}', [\App\Http\Controllers\Api\V1\General\GeneralController::class, 'page']);
     Route::post('/contact-us', [\App\Http\Controllers\Api\V1\General\GeneralController::class, 'contactUs']);
     Route::get('/settings', [\App\Http\Controllers\Api\V1\General\GeneralController::class, 'settings']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/orders/{order}/chat', [\App\Http\Controllers\Api\V1\General\ChatController::class, 'index']);
+        Route::post('/orders/{order}/chat', [\App\Http\Controllers\Api\V1\General\ChatController::class, 'store'])->middleware('throttle:60,1');
+        Route::get('/orders/{order}/invoice', [\App\Http\Controllers\Api\V1\General\InvoiceController::class, 'show']);
+        Route::get('/orders/{order}/invoice/download', [\App\Http\Controllers\Api\V1\General\InvoiceController::class, 'download']);
+        Route::post('/media/presigned-url', [\App\Http\Controllers\Api\V1\General\ChatController::class, 'presignedUrl'])->middleware('throttle:30,1');
+        Route::post('/media/upload-local', [\App\Http\Controllers\Api\V1\General\ChatController::class, 'uploadLocal'])->middleware('throttle:30,1');
+        Route::post('/sos/alert', [\App\Http\Controllers\Api\V1\General\EmergencyController::class, 'store'])->middleware('throttle:10,1');
+        Route::get('/orders/{order}/sos', [\App\Http\Controllers\Api\V1\General\EmergencyController::class, 'show']);
+        Route::post('/orders/{order}/dispute', [\App\Http\Controllers\Api\V1\General\DisputeController::class, 'store'])->middleware('throttle:10,1');
+        Route::get('/orders/{order}/dispute', [\App\Http\Controllers\Api\V1\General\DisputeController::class, 'show']);
+    });
 });
+
 
 Route::prefix('v1/customer')->middleware([\App\Http\Middleware\SetLocale::class])->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:otp_limiter');
@@ -27,6 +44,7 @@ Route::prefix('v1/customer')->middleware([\App\Http\Middleware\SetLocale::class]
 
     Route::get('/services', [ServiceController::class, 'index']);
     Route::get('/services/search', [ServiceController::class, 'search']);
+    Route::post('/services/calculate-cost', [ServiceController::class, 'calculateCost']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/profile', [ProfileController::class, 'show']);
@@ -45,6 +63,13 @@ Route::prefix('v1/customer')->middleware([\App\Http\Middleware\SetLocale::class]
             Route::post('/{order}/complete', [OrderController::class, 'complete']);
             Route::post('/{order}/cancel', [OrderController::class, 'cancel']);
             Route::post('/{order}/reviews', [OrderController::class, 'addReview']);
+            Route::post('/{order}/claim-warranty', [OrderController::class, 'claimWarranty']);
+        });
+
+        Route::prefix('subscriptions')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\V1\Customer\SubscriptionController::class, 'index']);
+            Route::get('/my-subscription', [\App\Http\Controllers\Api\V1\Customer\SubscriptionController::class, 'mySubscription']);
+            Route::post('/{package}/subscribe', [\App\Http\Controllers\Api\V1\Customer\SubscriptionController::class, 'subscribe']);
         });
 
         Route::prefix('custom-requests')->group(function () {
@@ -52,13 +77,17 @@ Route::prefix('v1/customer')->middleware([\App\Http\Middleware\SetLocale::class]
             Route::post('/', [\App\Http\Controllers\Api\V1\Customer\CustomRequestController::class, 'store']);
             Route::get('/{customRequest}/bids', [\App\Http\Controllers\Api\V1\Customer\CustomRequestController::class, 'bids']);
             Route::post('/{customRequest}/bids/{bid}/accept', [\App\Http\Controllers\Api\V1\Customer\CustomRequestController::class, 'acceptBid']);
+            Route::post('/{customRequest}/bids/{bid}/counter', [\App\Http\Controllers\Api\V1\Customer\CustomRequestController::class, 'counterOffer']);
+            Route::post('/{customRequest}/bids/{bid}/accept-counter', [\App\Http\Controllers\Api\V1\Customer\CustomRequestController::class, 'acceptCounterOffer']);
         });
     });
 });
 
 Route::prefix('v1/technician')->middleware([\App\Http\Middleware\SetLocale::class])->group(function () {
     Route::post('/register', [\App\Http\Controllers\Api\V1\Technician\AuthController::class, 'register'])->middleware('throttle:10,1');
+    Route::post('/verify-otp', [\App\Http\Controllers\Api\V1\Technician\AuthController::class, 'verifyOtp'])->middleware('throttle:otp_limiter');
     Route::post('/login', [\App\Http\Controllers\Api\V1\Technician\AuthController::class, 'login'])->middleware('throttle:10,1');
+    Route::post('/resend-otp', [\App\Http\Controllers\Api\V1\Technician\AuthController::class, 'resendOtp'])->middleware('throttle:otp_limiter');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/profile', [\App\Http\Controllers\Api\V1\Technician\ProfileController::class, 'show']);
@@ -70,6 +99,9 @@ Route::prefix('v1/technician')->middleware([\App\Http\Middleware\SetLocale::clas
             Route::get('/my-orders', [\App\Http\Controllers\Api\V1\Technician\OrderController::class, 'myOrders']);
             Route::post('/{order}/accept', [\App\Http\Controllers\Api\V1\Technician\OrderController::class, 'accept']);
             Route::post('/{order}/status', [\App\Http\Controllers\Api\V1\Technician\OrderController::class, 'updateStatus']);
+            Route::post('/{order}/complete', [\App\Http\Controllers\Api\V1\Technician\OrderController::class, 'complete']);
+            Route::get('/{order}/checklist', [\App\Http\Controllers\Api\V1\Technician\OrderChecklistController::class, 'show']);
+            Route::post('/{order}/checklist', [\App\Http\Controllers\Api\V1\Technician\OrderChecklistController::class, 'store']);
         });
 
         Route::post('/tracking/location', [\App\Http\Controllers\Api\V1\Technician\TrackingController::class, 'updateLocation'])->middleware('throttle:30,1');
@@ -79,6 +111,8 @@ Route::prefix('v1/technician')->middleware([\App\Http\Middleware\SetLocale::clas
             Route::get('/available', [\App\Http\Controllers\Api\V1\Technician\CustomRequestController::class, 'available']);
             Route::get('/my-bids', [\App\Http\Controllers\Api\V1\Technician\CustomRequestController::class, 'myBids']);
             Route::post('/{customRequest}/bids', [\App\Http\Controllers\Api\V1\Technician\CustomRequestController::class, 'submitBid']);
+            Route::post('/bids/{bid}/counter', [\App\Http\Controllers\Api\V1\Technician\CustomRequestController::class, 'counterOffer']);
+            Route::post('/bids/{bid}/accept-counter', [\App\Http\Controllers\Api\V1\Technician\CustomRequestController::class, 'acceptCounterOffer']);
         });
 
         Route::prefix('wallet')->group(function () {
@@ -86,5 +120,7 @@ Route::prefix('v1/technician')->middleware([\App\Http\Middleware\SetLocale::clas
             Route::get('/transactions', [\App\Http\Controllers\Api\V1\Technician\WalletController::class, 'transactions']);
             Route::post('/withdraw', [\App\Http\Controllers\Api\V1\Technician\WalletController::class, 'withdraw']);
         });
+
+        Route::get('/analytics', [\App\Http\Controllers\Api\V1\Technician\AnalyticsController::class, 'index']);
     });
 });

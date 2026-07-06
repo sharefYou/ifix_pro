@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ifix_client/core/api/api_constants.dart';
@@ -122,3 +122,6 @@ class DioHelper {
     );
   }
 }
+
+
+

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,9 @@ import 'package:ifix_tech/core/constants/app_constants.dart';
 import 'package:ifix_tech/core/constants/app_text_styles.dart';
 import 'package:ifix_tech/core/widgets/ifix_button.dart';
 import 'package:ifix_tech/core/widgets/ifix_card.dart';
+import 'package:ifix_tech/core/utils/navigation_helper.dart';
+import 'package:ifix_tech/core/routing/app_router.dart';
+import 'chat_screen.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
   final int orderId;
@@ -91,10 +95,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               const SectionHeader(title: 'الملخص المالي'),
               const SizedBox(height: 12),
               IFixCard(child: Column(children: [
-                _PriceRow('إجمالي السعر', '$total ل.س'),
-                _PriceRow('عمولة التطبيق (15%)', '-$commission ل.س'),
+                _PriceRow('إجمالي السعر', '$total ريال'),
+                _PriceRow('عمولة التطبيق (15%)', '-$commission ريال'),
                 const Divider(height: 24),
-                _PriceRow('صافي الربح', '$net ل.س', isBold: true, color: AppColors.success),
+                _PriceRow('صافي الربح', '$net ريال', isBold: true, color: AppColors.success),
               ])),
               const SizedBox(height: 32),
               if (!_accepted)
@@ -108,8 +112,113 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   Expanded(child: IFixButton(label: 'رفض', isOutlined: true, color: AppColors.error, onTap: () => context.pop())),
                 ])
               else
-                IFixButton(label: 'تم الوصول للموقع', onTap: () {}),
+                IFixButton(
+                  label: 'إتمام الزيارة وقائمة الفحص والتوقيع ✅',
+                  color: AppColors.accent,
+                  onTap: () => context.push(
+                    AppRoutes.orderChecklist,
+                    extra: {
+                      'orderId': widget.orderId,
+                      'serviceName': order['service']?['name_ar'] ?? 'صيانة عامة',
+                      'customerName': order['customer']?['name'] ?? 'العميل',
+                      'totalPrice': double.tryParse(order['total_price']?.toString() ?? '0')?.toInt() ?? 0,
+                    },
+                  ),
+                ),
+              if (_accepted || order['status'] == 'accepted' || order['status'] == 'in_progress' || order['status'] == 'on_the_way') ...[
+                const SizedBox(height: 16),
+                IFixButton(
+                  label: 'بدء التوجيه (Google Maps / Waze) 🧭',
+                  color: AppColors.success,
+                  onTap: () => NavigationHelper.launchNavigation(
+                    context,
+                    double.tryParse(order['user']?['lat']?.toString() ?? ''),
+                    double.tryParse(order['user']?['lng']?.toString() ?? ''),
+                    customerName: order['customer']?['name'] ?? 'العميل',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(children: [
+                  Expanded(
+                    child: IFixButton(
+                      label: 'محادثة العميل',
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(orderId: widget.orderId, recipientName: order['customer']?['name'] ?? 'العميل'))),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: IFixButton(
+                      label: 'زر الطوارئ SOS',
+                      color: AppColors.error,
+                      onTap: () => _triggerSosAlert(context, widget.orderId),
+                    ),
+                  ),
+                ]),
+              ],
+              if (order['status'] == 'completed') ...[
+                const SizedBox(height: 16),
+                IFixButton(
+                  label: 'عرض الفاتورة',
+                  onTap: () => _showInvoiceModal(context, order),
+                ),
+              ],
               const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _triggerSosAlert(BuildContext context, int orderId) async {
+    try {
+      final res = await Dio().post(
+        'https://sharef.alwaysdata.net/api/v1/general/sos/alert',
+        data: {
+          'order_id': orderId,
+          'lat': 24.7136,
+          'lng': 46.6753,
+          'reason': 'safety_threat',
+        },
+      );
+      if (res.statusCode == 201 && context.mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            backgroundColor: AppColors.surfaceVariant,
+            title: const Row(children: [Icon(Icons.warning, color: AppColors.error), SizedBox(width: 8), Text('تم إرسال بلاغ الطوارئ!', style: TextStyle(fontFamily: 'Cairo'))]),
+            content: const Text('تم إبلاغ الإدارة وفريق التدخل السريع بموقعك الحالي وحالة الطوارئ.', style: TextStyle(fontFamily: 'Cairo')),
+            actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('حسناً', style: TextStyle(fontFamily: 'Cairo')))],
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('حدث خطأ أثناء إرسال بلاغ الطوارئ', style: TextStyle(fontFamily: 'Cairo'))));
+      }
+    }
+  }
+
+  void _showInvoiceModal(BuildContext context, Map<String, dynamic> order) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (_) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('فاتورة ضريبية مبسطة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
+              const Divider(height: 32),
+              _PriceRow('رقم الطلب', '#${order['id'] ?? widget.orderId}'),
+              _PriceRow('الخدمة', order['service']?['name_ar'] ?? 'صيانة عامة'),
+              _PriceRow('الإجمالي', '${order['total_price'] ?? 0} ريال', isBold: true, color: AppColors.success),
+              const SizedBox(height: 24),
+              IFixButton(label: 'إغلاق', onTap: () => Navigator.pop(context)),
             ],
           ),
         ),

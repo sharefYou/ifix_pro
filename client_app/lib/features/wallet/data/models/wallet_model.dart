@@ -1,4 +1,4 @@
-class WalletModel {
+﻿class WalletModel {
   final int id;
   final double availableBalance;
   final double heldBalance;
@@ -49,3 +49,6 @@ class WalletTransactionModel {
     );
   }
 }
+
+
+

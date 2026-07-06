@@ -100,6 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 24),
 
             // Menu Items
+            _MenuItem(Icons.analytics_outlined, 'التحليلات المالية والأداء 📈', AppColors.gold, () => context.push(AppRoutes.analytics)),
             _MenuItem(Icons.description_outlined, 'الشروط والأحكام', AppColors.textSecondary, () {}),
             _MenuItem(Icons.headset_mic_outlined, 'تواصل مع الدعم الفني', AppColors.textSecondary, () {}),
             _MenuItem(Icons.logout_rounded, 'تسجيل الخروج', AppColors.error, () => context.go(AppRoutes.login)),

@@ -11,6 +11,7 @@ enum OrderStatus: string
     case IN_PROGRESS = 'in_progress';
     case COMPLETED = 'completed';
     case CANCELED = 'canceled';
+    case DISPUTED = 'disputed';
 
     public function getLabel(): string
     {
@@ -22,6 +23,7 @@ enum OrderStatus: string
             self::IN_PROGRESS => 'In Progress',
             self::COMPLETED => 'Completed',
             self::CANCELED => 'Canceled',
+            self::DISPUTED => 'Disputed (Under Arbitration)',
         };
     }
 
@@ -32,7 +34,7 @@ enum OrderStatus: string
             self::ACCEPTED => 'primary',
             self::ON_THE_WAY, self::IN_PROGRESS => 'info',
             self::COMPLETED => 'success',
-            self::CANCELED => 'danger',
+            self::CANCELED, self::DISPUTED => 'danger',
         };
     }
 }

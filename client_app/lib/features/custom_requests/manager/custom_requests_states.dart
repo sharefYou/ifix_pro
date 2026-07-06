@@ -51,3 +51,18 @@ class AcceptBidErrorState extends CustomRequestsStates {
   final String error;
   AcceptBidErrorState(this.error);
 }
+
+class CounterOfferLoadingState extends CustomRequestsStates {}
+
+class CounterOfferSuccessState extends CustomRequestsStates {
+  final String message;
+  CounterOfferSuccessState(this.message);
+}
+
+class CounterOfferErrorState extends CustomRequestsStates {
+  final String error;
+  CounterOfferErrorState(this.error);
+}
+
+
+

@@ -209,4 +209,91 @@ class WalletService
             ]);
         });
     }
+
+    public function approveWithdrawal(WalletTransaction $transaction): void
+    {
+        DB::transaction(function () use ($transaction) {
+            if ($transaction->status !== 'pending') {
+                throw new Exception('Transaction is not pending.');
+            }
+
+            if ($transaction->type === 'withdrawal') {
+                $wallet = Wallet::where('user_id', $transaction->user_id)->lockForUpdate()->first();
+                if (!$wallet) {
+                    throw new Exception('Wallet not found.');
+                }
+
+                $amount = (float) $transaction->amount;
+                $held = (float) ($wallet->held_balance ?? 0);
+
+                if ($held < $amount) {
+                    throw new Exception('Insufficient held funds.');
+                }
+
+                $wallet->held_balance = $held - $amount;
+                $wallet->save();
+            } elseif ($transaction->type === 'deposit') {
+                $this->depositFunds($transaction->user, (float) $transaction->amount);
+            }
+
+            $transaction->update(['status' => 'completed']);
+        });
+    }
+
+    public function rejectWithdrawal(WalletTransaction $transaction): void
+    {
+        DB::transaction(function () use ($transaction) {
+            if ($transaction->status !== 'pending') {
+                throw new Exception('Transaction is not pending.');
+            }
+
+            if ($transaction->type === 'withdrawal') {
+                $wallet = Wallet::where('user_id', $transaction->user_id)->lockForUpdate()->first();
+                if (!$wallet) {
+                    throw new Exception('Wallet not found.');
+                }
+
+                $amount = (float) $transaction->amount;
+                $held = (float) ($wallet->held_balance ?? 0);
+
+                if ($held < $amount) {
+                    throw new Exception('Insufficient held funds.');
+                }
+
+                $wallet->held_balance = $held - $amount;
+                $wallet->available_balance = (float) ($wallet->available_balance ?? 0) + $amount;
+                $wallet->save();
+            }
+
+            $transaction->update(['status' => 'rejected']);
+        });
+    }
+
+    public function withdrawFunds(User $user, float $amount, string $type = 'subscription'): void
+    {
+        DB::transaction(function () use ($user, $amount, $type) {
+            $wallet = Wallet::where('user_id', $user->id)->lockForUpdate()->first();
+
+            if (!$wallet) {
+                throw new Exception('Wallet not found for user.');
+            }
+
+            $available = (float) ($wallet->available_balance ?? 0);
+
+            if ($available < $amount) {
+                throw new Exception('Insufficient funds.');
+            }
+
+            $wallet->available_balance = $available - $amount;
+            $wallet->save();
+
+            WalletTransaction::create([
+                'user_id' => $user->id,
+                'amount' => $amount,
+                'type' => $type,
+                'status' => 'completed',
+            ]);
+        });
+    }
 }
+

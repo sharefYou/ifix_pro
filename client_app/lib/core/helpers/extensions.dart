@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 extension NavigationExtensions on BuildContext {
   Future<dynamic>? push(Widget screen) =>
@@ -226,3 +226,6 @@ extension StringNumberFormatting on String {
     return result;
   }
 }
+
+
+

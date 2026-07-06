@@ -59,12 +59,18 @@ class WalletTransactionResource extends Resource
             TextColumn::make('status')
                 ->label(__('admin.status'))
                 ->badge()
-                ->formatStateUsing(fn (string $state): string => __('admin.status_' . $state))
-                ->color(fn (string $state): string => match ($state) {
-                    'pending' => 'warning',
-                    'completed' => 'success',
-                    'rejected' => 'danger',
-                    default => 'gray',
+                ->formatStateUsing(function ($state): string {
+                    $val = $state instanceof \BackedEnum ? $state->value : (string) $state;
+                    return __('admin.status_' . $val);
+                })
+                ->color(function ($state): string {
+                    $val = $state instanceof \BackedEnum ? $state->value : (string) $state;
+                    return match ($val) {
+                        'pending' => 'warning',
+                        'completed' => 'success',
+                        'rejected' => 'danger',
+                        default => 'gray',
+                    };
                 }),
             TextColumn::make('created_at')->label(__('admin.created_at'))->dateTime(),
         ])
@@ -76,8 +82,7 @@ class WalletTransactionResource extends Resource
                 ->visible(fn (WalletTransaction $record): bool => $record->status === 'pending')
                 ->action(function (WalletTransaction $record) {
                     $walletService = app(WalletService::class);
-                    $walletService->depositFunds($record->user, (float) $record->amount);
-                    $record->update(['status' => 'completed']);
+                    $walletService->approveWithdrawal($record);
                 }),
             Action::make('Reject')
                 ->label(__('admin.reject'))
@@ -85,7 +90,8 @@ class WalletTransactionResource extends Resource
                 ->color('danger')
                 ->visible(fn (WalletTransaction $record): bool => $record->status === 'pending')
                 ->action(function (WalletTransaction $record) {
-                    $record->update(['status' => 'rejected']);
+                    $walletService = app(WalletService::class);
+                    $walletService->rejectWithdrawal($record);
                 }),
         ]);
     }

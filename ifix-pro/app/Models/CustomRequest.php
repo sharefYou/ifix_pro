@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['user_id', 'description', 'visit_date', 'status'])]
+#[Fillable(['user_id', 'description', 'audio_memo_path', 'video_path', 'visit_date', 'status'])]
 class CustomRequest extends Model
 {
     protected function casts(): array

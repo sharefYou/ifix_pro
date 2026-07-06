@@ -1,4 +1,4 @@
-String? _fixEmulatorUrl(String? url) {
+﻿String? _fixEmulatorUrl(String? url) {
   if (url == null || url.trim().isEmpty) return null;
   var fixed = url.trim();
   const baseUrl = 'https://sharef.alwaysdata.net';
@@ -79,3 +79,6 @@ class ServiceCategoryModel {
     );
   }
 }
+
+
+

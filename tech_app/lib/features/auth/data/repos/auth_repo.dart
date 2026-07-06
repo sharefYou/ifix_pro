@@ -59,6 +59,38 @@ class AuthRepository {
     }
   }
 
+  Future<Map<String, dynamic>> verifyOtp(String phone, String otpCode) async {
+    try {
+      final dio = await DioFactory.getDio();
+      final response = await dio.post('verify-otp', data: {
+        'phone': phone,
+        'otp_code': otpCode,
+      });
+      final data = response.data as Map<String, dynamic>;
+      final token = data['token']?.toString();
+      if (token != null && token.isNotEmpty) {
+        await DioFactory.saveToken(token);
+        return data;
+      } else {
+        throw data['message'] ?? 'OTP verification failed';
+      }
+    } catch (e) {
+      throw ErrorHandler.handleGeneralError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> resendOtp(String phone) async {
+    try {
+      final dio = await DioFactory.getDio();
+      final response = await dio.post('resend-otp', data: {
+        'phone': phone,
+      });
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      throw ErrorHandler.handleGeneralError(e);
+    }
+  }
+
   Future<void> logout() async {
     try {
       final dio = await DioFactory.getDio();

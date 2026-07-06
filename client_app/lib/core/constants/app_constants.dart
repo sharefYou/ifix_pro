@@ -1,4 +1,4 @@
-class AppConstants {
+﻿class AppConstants {
   AppConstants._();
 
   static const String appName = 'iFix';
@@ -29,3 +29,6 @@ class AppConstants {
   static const Duration animNormal = Duration(milliseconds: 350);
   static const Duration animSlow = Duration(milliseconds: 500);
 }
+
+
+

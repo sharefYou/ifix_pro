@@ -20,7 +20,7 @@ class PrimaryButton extends StatelessWidget {
       onPressed: isLoading ? () {} : onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: const Color(0xFF161B22),
         elevation: 0,
         padding: const EdgeInsets.symmetric(vertical: 18),
         shape: RoundedRectangleBorder(
@@ -32,7 +32,7 @@ class PrimaryButton extends StatelessWidget {
               height: 24,
               width: 24,
               child: CircularProgressIndicator(
-                color: Colors.white,
+                color: Color(0xFF161B22),
                 strokeWidth: 2.5,
               ),
             )
@@ -48,3 +48,6 @@ class PrimaryButton extends StatelessWidget {
     );
   }
 }
+
+
+

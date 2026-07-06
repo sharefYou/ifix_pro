@@ -38,6 +38,8 @@ class OrdersCubit extends Cubit<OrdersStates> {
     String? notes,
     required String paymentMethod,
     required double totalAmount,
+    String? audioMemoPath,
+    String? videoPath,
   }) async {
     emit(CreateOrderLoadingState());
     try {
@@ -50,6 +52,8 @@ class OrdersCubit extends Cubit<OrdersStates> {
           'notes': notes ?? '',
           'payment_method': paymentMethod,
           'total_amount': totalAmount,
+          if (audioMemoPath != null) 'audio_memo_path': audioMemoPath,
+          if (videoPath != null) 'video_path': videoPath,
         },
       );
       final newOrder = OrderModel.fromJson(response.data['order']);
@@ -108,3 +112,6 @@ class OrdersCubit extends Cubit<OrdersStates> {
     }
   }
 }
+
+
+

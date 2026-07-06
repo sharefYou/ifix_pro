@@ -30,10 +30,15 @@ class WalletController extends Controller
     {
         $transactions = WalletTransaction::where('user_id', auth()->id())
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(20);
 
         return response()->json([
-            'data' => WalletTransactionResource::collection($transactions),
+            'data' => WalletTransactionResource::collection($transactions->items()),
+            'meta' => [
+                'current_page' => $transactions->currentPage(),
+                'last_page' => $transactions->lastPage(),
+                'total' => $transactions->total(),
+            ],
         ]);
     }
 

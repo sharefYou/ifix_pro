@@ -49,6 +49,12 @@ class AuthController extends Controller
             ], 400);
         }
 
+        if ($user->is_technician || $user->is_admin) {
+            return response()->json([
+                'message' => __('auth.failed'),
+            ], 403);
+        }
+
         $user->update([
             'phone_verified_at' => now(),
             'otp_code' => null,
@@ -72,6 +78,12 @@ class AuthController extends Controller
             return response()->json([
                 'message' => __('auth.failed'),
             ], 401);
+        }
+
+        if ($user->is_technician || $user->is_admin) {
+            return response()->json([
+                'message' => __('auth.failed'),
+            ], 403);
         }
 
         if (is_null($user->phone_verified_at)) {

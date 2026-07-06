@@ -34,10 +34,15 @@ class OrderController extends Controller
             )
             ->orderBy('distance')
             ->with(['user', 'service'])
-            ->get();
+            ->paginate(20);
 
         return response()->json([
-            'data' => $orders,
+            'data' => $orders->items(),
+            'meta' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'total' => $orders->total(),
+            ],
         ]);
     }
 
@@ -46,10 +51,15 @@ class OrderController extends Controller
         $orders = Order::where('technician_id', auth()->id())
             ->with(['user', 'service'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(20);
 
         return response()->json([
-            'data' => $orders,
+            'data' => $orders->items(),
+            'meta' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'total' => $orders->total(),
+            ],
         ]);
     }
 
@@ -110,4 +120,30 @@ class OrderController extends Controller
             'order' => $order,
         ]);
     }
+
+    public function complete(\App\Services\OrderService $orderService, Order $order): JsonResponse
+    {
+        if ($order->technician_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $checklist = $order->checklist;
+        if (!$checklist || (!$checklist->safety_checked && !$checklist->system_tested)) {
+            return response()->json([
+                'message' => 'يجب إتمام قائمة الفحص الرقمية (سلامة العمل واختبار التشغيل) قبل إغلاق الطلب.'
+            ], 422);
+        }
+
+        try {
+            $orderService->completeOrder($order);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+
+        return response()->json([
+            'message' => 'تم إنجاز الطلب وإغلاقه بنجاح، وتم تحويل المستحقات للمحفظة وتفعيل الضمان.',
+            'order' => $order,
+        ]);
+    }
 }
+

@@ -1,4 +1,4 @@
-class AppConstants {
+﻿class AppConstants {
   static const String kToken = 'token';
   static const String kUser = 'user';
   static const String kSignalsTimer = 'signals_timer';
@@ -18,3 +18,6 @@ class AppConstants {
   static const String kSignalsTopicEN = 'signals_en';
   static const String kSignalsTopicTR = 'signals_tr';
 }
+
+
+

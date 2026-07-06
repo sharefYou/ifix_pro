@@ -14,9 +14,15 @@ class CustomRequestsCubit extends Cubit<CustomRequestsStates> {
   Future<void> fetchMyCustomRequests() async {
     emit(CustomRequestsLoadingState());
     try {
-      // If there's an endpoint for listing custom requests
-      // Mocking or fetching from general list
+      final response = await DioHelper.getData(endPoint: ApiConstants.customRequests);
       myRequests = [];
+      if (response.data['data'] is List) {
+        for (final item in response.data['data']) {
+          if (item is Map<String, dynamic>) {
+            myRequests.add(CustomRequestModel.fromJson(item));
+          }
+        }
+      }
       emit(CustomRequestsLoadedState(myRequests));
     } catch (e) {
       final error = ErrorHandler.handleGeneralError(e);
@@ -85,9 +91,36 @@ class CustomRequestsCubit extends Cubit<CustomRequestsStates> {
         },
       );
       emit(AcceptBidSuccessState('تم قبول العرض وتحويله إلى طلب صيانة مؤكد'));
+      await fetchMyCustomRequests();
     } catch (e) {
       final error = ErrorHandler.handleGeneralError(e);
       emit(AcceptBidErrorState(error));
     }
   }
+
+  Future<void> counterOffer({
+    required int customRequestId,
+    required int bidId,
+    required double counterPrice,
+    String? counterNotes,
+  }) async {
+    emit(CounterOfferLoadingState());
+    try {
+      await DioHelper.postData(
+        endPoint: ApiConstants.counterOffer(customRequestId, bidId),
+        data: {
+          'counter_price': counterPrice,
+          if (counterNotes != null && counterNotes.isNotEmpty) 'counter_notes': counterNotes,
+        },
+      );
+      emit(CounterOfferSuccessState('تم إرسال العرض المقابل للفني بنجاح'));
+      await fetchBids(customRequestId);
+    } catch (e) {
+      final error = ErrorHandler.handleGeneralError(e);
+      emit(CounterOfferErrorState(error));
+    }
+  }
 }
+
+
+

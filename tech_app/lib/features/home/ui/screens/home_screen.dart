@@ -8,6 +8,7 @@ import 'package:ifix_tech/core/routing/app_router.dart';
 import 'package:ifix_tech/core/widgets/ifix_button.dart';
 import 'package:ifix_tech/core/widgets/ifix_card.dart';
 import 'package:ifix_tech/features/orders/logic/order_cubit.dart';
+import 'package:ifix_tech/core/utils/navigation_helper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -132,15 +133,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _HomeContent extends StatelessWidget {
+class _HomeContent extends StatefulWidget {
   final bool isOnline;
 
   const _HomeContent({required this.isOnline});
 
   @override
+  State<_HomeContent> createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<_HomeContent> {
+  bool _showMyOrders = false;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<OrderCubit>().getAvailableOrders();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: () => context.read<OrderCubit>().getAvailableOrders(),
+      onRefresh: () => _showMyOrders ? context.read<OrderCubit>().getMyOrders() : context.read<OrderCubit>().getAvailableOrders(),
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.paddingHorizontal),
         child: Column(
@@ -152,65 +166,192 @@ class _HomeContent extends StatelessWidget {
                   child: _QuickStatCard(
                     'أرباح اليوم',
                     '245',
-                    'ل.س',
+                    'ريال',
                     AppColors.accent,
+                    onTap: () => context.push(AppRoutes.analytics),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _QuickStatCard('التقييم', '4.9', '⭐', AppColors.gold),
+                  child: _QuickStatCard(
+                    'التقييم',
+                    '4.9',
+                    '⭐',
+                    AppColors.gold,
+                    onTap: () => context.push(AppRoutes.analytics),
+                  ),
                 ),
               ],
             ),
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () => context.push(AppRoutes.analytics),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.gold.withValues(alpha: 0.2),
+                      AppColors.accent.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                  border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.analytics_rounded, color: AppColors.gold, size: 24),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'لوحة التحليلات المالية والأداء (الرسوم البيانية 📈)',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          fontFamily: 'Cairo',
+                        ),
+                      ),
+                    ),
+                    Icon(Icons.arrow_forward_ios_rounded, color: AppColors.gold, size: 16),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 24),
-            if (!isOnline)
+            if (!widget.isOnline)
               _buildOfflineAlert()
             else ...[
-              const SectionHeader(title: 'طلبات جديدة (مباشرة)'),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (_showMyOrders) {
+                          setState(() => _showMyOrders = false);
+                          context.read<OrderCubit>().getAvailableOrders();
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: !_showMyOrders ? AppColors.accent : AppColors.surfaceVariant,
+                          borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'طلبات جديدة (مباشرة) 🟢',
+                          style: TextStyle(
+                            color: !_showMyOrders ? Colors.white : AppColors.textSecondary,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Cairo',
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (!_showMyOrders) {
+                          setState(() => _showMyOrders = true);
+                          context.read<OrderCubit>().getMyOrders();
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: _showMyOrders ? AppColors.accent : AppColors.surfaceVariant,
+                          borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'طلباتي النشطة (المسار) 🚚',
+                          style: TextStyle(
+                            color: _showMyOrders ? Colors.white : AppColors.textSecondary,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Cairo',
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _showMyOrders ? 'مسار العمل والزيارات اليومية' : 'الطلبات المتاحة في منطقتك',
+                    style: AppTextStyles.titleMedium,
+                  ),
+                  TextButton.icon(
+                    onPressed: () => context.read<OrderCubit>().sortOrdersByProximity(),
+                    icon: const Icon(Icons.near_me_rounded, size: 16, color: AppColors.accent),
+                    label: const Text('ترتيب حسب الأقرب 📍', style: TextStyle(color: AppColors.accent, fontSize: 13, fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
               const SizedBox(height: 12),
               BlocBuilder<OrderCubit, OrderState>(
                 builder: (context, state) {
                   if (state is OrderLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: Padding(padding: EdgeInsets.all(40), child: CircularProgressIndicator()));
                   }
                   if (state is OrderError) {
-                    return Center(child: Text(state.message));
+                    return Center(child: Padding(padding: EdgeInsets.all(20), child: Text(state.message, style: const TextStyle(fontFamily: 'Cairo'))));
                   }
-                  if (state is OrdersLoaded) {
-                    if (state.orders.isEmpty) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 40),
-                          child: Text('لا يوجد طلبات متاحة حالياً'),
-                        ),
-                      );
-                    }
-                    return ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: state.orders.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 12),
-                      itemBuilder: (_, i) {
-                        final order = state.orders[i];
-                        return _NewOrderCard(
-                          serviceName:
-                              order['service']?['name_ar'] ?? 'خدمة صيانة',
-                          customerName: order['customer']?['name'] ?? 'عميل',
-                          distance: '1.5 كم',
-                          price:
-                              double.tryParse(
-                                order['total_price'].toString(),
-                              )?.toInt() ??
-                              0,
-                          onAccept: () => context.push(
-                            AppRoutes.orderDetails,
-                            extra: {'orderId': order['id'], 'orderData': order},
-                          ),
-                        );
-                      },
+                  List<dynamic> orders = [];
+                  if (!_showMyOrders && state is OrdersLoaded) {
+                    orders = state.orders;
+                  } else if (_showMyOrders && state is MyOrdersLoaded) {
+                    orders = state.orders;
+                  } else if (state is OrdersLoaded) {
+                    orders = state.orders;
+                  } else if (state is MyOrdersLoaded) {
+                    orders = state.orders;
+                  }
+
+                  if (orders.isEmpty && (state is OrdersLoaded || state is MyOrdersLoaded)) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 40),
+                        child: Text(_showMyOrders ? 'لا يوجد طلبات نشطة حالياً' : 'لا يوجد طلبات متاحة حالياً', style: const TextStyle(fontFamily: 'Cairo')),
+                      ),
                     );
                   }
-                  return const SizedBox();
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: orders.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    itemBuilder: (_, i) {
+                      final order = orders[i];
+                      return _NewOrderCard(
+                        serviceName: order['service']?['name_ar'] ?? 'خدمة صيانة',
+                        customerName: order['customer']?['name'] ?? 'عميل',
+                        distance: NavigationHelper.calculateDistanceKm(order),
+                        price: double.tryParse(order['total_price']?.toString() ?? '0')?.toInt() ?? 0,
+                        isActiveOrder: _showMyOrders,
+                        onAccept: () => context.push(
+                          AppRoutes.orderDetails,
+                          extra: {'orderId': order['id'], 'orderData': order},
+                        ),
+                        onSecondaryAction: _showMyOrders
+                            ? () => NavigationHelper.launchNavigation(
+                                  context,
+                                  double.tryParse(order['user']?['lat']?.toString() ?? ''),
+                                  double.tryParse(order['user']?['lng']?.toString() ?? ''),
+                                  customerName: order['customer']?['name'],
+                                )
+                            : () {},
+                      );
+                    },
+                  );
                 },
               ),
             ],
@@ -257,30 +398,34 @@ class _HomeContent extends StatelessWidget {
 class _QuickStatCard extends StatelessWidget {
   final String label, value, unit;
   final Color color;
+  final VoidCallback? onTap;
 
-  const _QuickStatCard(this.label, this.value, this.unit, this.color);
+  const _QuickStatCard(this.label, this.value, this.unit, this.color, {this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return IFixCard(
-      child: Column(
-        children: [
-          Text(label, style: AppTextStyles.caption),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                value,
-                style: AppTextStyles.displayMedium.copyWith(color: color),
-              ),
-              const SizedBox(width: 4),
-              Text(unit, style: AppTextStyles.bodySmall.copyWith(color: color)),
-            ],
-          ),
-        ],
+    return GestureDetector(
+      onTap: onTap,
+      child: IFixCard(
+        child: Column(
+          children: [
+            Text(label, style: AppTextStyles.caption),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  value,
+                  style: AppTextStyles.displayMedium.copyWith(color: color),
+                ),
+                const SizedBox(width: 4),
+                Text(unit, style: AppTextStyles.bodySmall.copyWith(color: color)),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -289,14 +434,18 @@ class _QuickStatCard extends StatelessWidget {
 class _NewOrderCard extends StatelessWidget {
   final String serviceName, customerName, distance;
   final int price;
+  final bool isActiveOrder;
   final VoidCallback onAccept;
+  final VoidCallback? onSecondaryAction;
 
   const _NewOrderCard({
     required this.serviceName,
     required this.customerName,
     required this.distance,
     required this.price,
+    this.isActiveOrder = false,
     required this.onAccept,
+    this.onSecondaryAction,
   });
 
   @override
@@ -335,7 +484,7 @@ class _NewOrderCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '$price ل.س',
+                    '$price ريال',
                     style: AppTextStyles.headlineSmall.copyWith(
                       color: AppColors.gold,
                     ),
@@ -363,11 +512,11 @@ class _NewOrderCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: IFixButton(
-                  label: 'تجاهل',
+                  label: isActiveOrder ? 'بدء التوجيه 🧭' : 'تجاهل',
                   height: 44,
-                  isOutlined: true,
-                  color: AppColors.textSecondary,
-                  onTap: () {},
+                  isOutlined: !isActiveOrder,
+                  color: isActiveOrder ? AppColors.success : AppColors.textSecondary,
+                  onTap: onSecondaryAction ?? () {},
                 ),
               ),
             ],

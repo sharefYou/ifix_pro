@@ -16,6 +16,8 @@ class CreateCustomRequestRequest extends FormRequest
         return [
             'description' => ['required', 'string'],
             'visit_date' => ['required', 'date', 'after:now'],
+            'audio_memo_path' => ['nullable', 'string', 'max:1024'],
+            'video_path' => ['nullable', 'string', 'max:1024'],
             'images' => ['sometimes', 'array', 'max:5'],
             'images.*' => ['image', 'max:2048'],
         ];

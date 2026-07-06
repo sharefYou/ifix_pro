@@ -86,6 +86,10 @@ class OrderService
         }
 
         $this->walletService->releaseFundsToTechnician($order);
-        $order->update(['status' => OrderStatus::COMPLETED]);
+        $order->update([
+            'status' => OrderStatus::COMPLETED,
+            'warranty_expires_at' => now()->addDays(30),
+            'warranty_status' => 'active',
+        ]);
     }
 }

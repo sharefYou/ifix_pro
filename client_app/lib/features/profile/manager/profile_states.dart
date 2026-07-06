@@ -1,4 +1,4 @@
-import '../data/models/user_model.dart';
+﻿import '../data/models/user_model.dart';
 
 abstract class ProfileStates {}
 
@@ -27,3 +27,6 @@ class ProfileUpdateErrorState extends ProfileStates {
   final String error;
   ProfileUpdateErrorState(this.error);
 }
+
+
+

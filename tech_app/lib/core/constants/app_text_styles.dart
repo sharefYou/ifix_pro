@@ -46,6 +46,30 @@ class AppTextStyles {
     height: 1.5,
   );
 
+  static const TextStyle titleLarge = TextStyle(
+    fontFamily: _fontFamily,
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+    height: 1.4,
+  );
+
+  static const TextStyle titleMedium = TextStyle(
+    fontFamily: _fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+    height: 1.4,
+  );
+
+  static const TextStyle titleSmall = TextStyle(
+    fontFamily: _fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.4,
+  );
+
   static const TextStyle bodyLarge = TextStyle(
     fontFamily: _fontFamily,
     fontSize: 15,

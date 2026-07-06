@@ -15,6 +15,7 @@ class RegisterTechnicianRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'string', 'email', 'unique:users,email'],
             'phone' => ['required', 'string', 'unique:users,phone'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'city' => ['required', 'string'],

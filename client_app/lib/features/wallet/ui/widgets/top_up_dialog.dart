@@ -13,8 +13,8 @@ class TopUpDialog extends StatefulWidget {
 }
 
 class _TopUpDialogState extends State<TopUpDialog> {
-  static const Color tertiaryColor = Color(0xFF8C3C3C);
-  static const Color textColor = Color(0xFF3A302A);
+  static const Color tertiaryColor = Color(0xFF2979FF);
+  static const Color textColor = Color(0xFFF0F6FC);
 
   final codeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -95,8 +95,8 @@ class _TopUpDialogState extends State<TopUpDialog> {
                               }
                             },
                       child: isLoading
-                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('شحن الرصيد الآن', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Color(0xFF161B22), strokeWidth: 2))
+                          : const Text('شحن الرصيد الآن', style: TextStyle(color: Color(0xFF161B22), fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -108,3 +108,6 @@ class _TopUpDialogState extends State<TopUpDialog> {
     );
   }
 }
+
+
+

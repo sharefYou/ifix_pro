@@ -50,8 +50,8 @@ class AutoAssignTechnician implements ShouldQueue
         $customerLat = $order->user->lat;
         $customerLng = $order->user->lng;
 
-        // Find the single closest available technician
-        $technician = User::selectRaw("
+        // Find all available technicians within radius and score them using AI multi-variable engine
+        $technicians = User::selectRaw("
                 users.*,
                 ( 6371 * acos( cos( radians(?) ) *
                   cos( radians( users.lat ) )
@@ -69,11 +69,31 @@ class AutoAssignTechnician implements ShouldQueue
             ->whereNotNull('users.lng')
             ->where('users.last_seen_at', '>=', now()->subMinutes(15))
             ->having('distance', '<', self::RADIUS_KM)
-            ->orderBy('distance')
-            ->first();
+            ->withCount(['technicianOrders as active_orders_count' => function ($query) {
+                $query->whereIn('status', [OrderStatus::ACCEPTED, OrderStatus::ON_THE_WAY, OrderStatus::IN_PROGRESS]);
+            }])
+            ->withCount(['technicianOrders as completed_orders_count' => function ($query) {
+                $query->where('status', OrderStatus::COMPLETED);
+            }])
+            ->withAvg('technicianReviews as avg_tech_rating', 'avg_rating')
+            ->get();
+
+        if ($technicians->isEmpty()) {
+            return; // No available technician in range
+        }
+
+        // AI Multi-Variable Scoring Algorithm (Distance: 40%, Rating: 30%, Workload: 20%, Experience: 10%)
+        $technician = $technicians->sortByDesc(function ($tech) {
+            $distanceScore = max(0, 40 - ($tech->distance * 1.5));
+            $ratingScore = (($tech->avg_tech_rating ?? 5.0) / 5.0) * 30;
+            $workloadScore = $tech->active_orders_count == 0 ? 20 : ($tech->active_orders_count == 1 ? 10 : 0);
+            $experienceScore = min(10, $tech->completed_orders_count * 0.5);
+
+            return $distanceScore + $ratingScore + $workloadScore + $experienceScore;
+        })->first();
 
         if (! $technician) {
-            return; // No available technician in range
+            return;
         }
 
         // Assign the technician inside a transaction

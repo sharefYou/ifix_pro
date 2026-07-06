@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 
 class ErrorHandler {
   static String handleDioError(DioException e) {
@@ -54,3 +54,6 @@ class ErrorHandler {
     return 'Unexpected error: ${e.toString()}';
   }
 }
+
+
+

@@ -156,4 +156,10 @@ return [
     'all_time_orders' => 'طلبات الصيانة المنجزة والجارية',
     'total_pending_topups' => 'طلبات شحن الأرصدة المعلقة',
     'awaiting_approval' => 'بانتظار المراجعة والاعتماد من الإدارة',
+
+    // Added recently
+    'manage_services' => 'إدارة الخدمات التابعة',
+    'add_service' => 'إضافة خدمة جديدة',
+    'all' => 'الكل',
+    'currency' => 'العملة المعتمدة',
 ];

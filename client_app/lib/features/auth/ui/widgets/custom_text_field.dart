@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
@@ -19,9 +19,9 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFFC2652A);
-    const Color borderColor = Color(0xFFD8D0C8);
+    const Color borderColor = Color(0xFF30363D);
     const Color surfaceColor = Colors.white;
-    const Color textColor = Color(0xFF3A302A);
+    const Color textColor = Color(0xFFF0F6FC);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,3 +75,6 @@ class CustomTextField extends StatelessWidget {
     );
   }
 }
+
+
+

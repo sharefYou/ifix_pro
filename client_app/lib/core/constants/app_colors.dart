@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class AppColors {
   AppColors._();
@@ -50,3 +50,6 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 }
+
+
+

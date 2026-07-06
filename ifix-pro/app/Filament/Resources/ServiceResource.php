@@ -17,6 +17,7 @@ class ServiceResource extends Resource
 {
     protected static ?string $model = Service::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-wrench';
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function getNavigationGroup(): ?string
     {

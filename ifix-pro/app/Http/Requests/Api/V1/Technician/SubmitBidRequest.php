@@ -15,6 +15,8 @@ class SubmitBidRequest extends FormRequest
     {
         return [
             'price' => ['required', 'numeric', 'min:0'],
+            'labor_cost' => ['nullable', 'numeric', 'min:0'],
+            'parts_cost' => ['nullable', 'numeric', 'min:0'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

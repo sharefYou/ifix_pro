@@ -41,7 +41,11 @@ class _LoginScreenState extends State<LoginScreen> {
         if (state is AuthSuccess) {
           context.go(AppRoutes.home);
         } else if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message, style: Theme.of(context).textTheme.bodyMedium)));
+          if (state.message.contains('not verified') || state.message.contains('غير مفعل') || state.message.contains('phone_not_verified')) {
+            context.go(AppRoutes.otp, extra: {'phone': _phoneCtrl.text.trim()});
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message, style: Theme.of(context).textTheme.bodyMedium)));
+          }
         }
       },
       child: Scaffold(

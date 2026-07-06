@@ -1,4 +1,4 @@
-import 'package:easy_localization/easy_localization.dart' hide TextDirection;
+﻿import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ifix_client/core/api/dio_helper.dart';
@@ -65,3 +65,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
+

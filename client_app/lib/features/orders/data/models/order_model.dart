@@ -1,4 +1,4 @@
-class OrderModel {
+﻿class OrderModel {
   final int id;
   final int userId;
   final int? technicianId;
@@ -76,3 +76,6 @@ class OrderModel {
     }
   }
 }
+
+
+

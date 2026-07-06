@@ -152,7 +152,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
-        if (state is AuthSuccess) {
+        if (state is OtpSentSuccess) {
+          if (state.devOtp != null) {
+            _showSnack('DEV OTP: ${state.devOtp}');
+          }
+          context.go(AppRoutes.otp, extra: {'phone': _phoneCtrl.text.trim()});
+        } else if (state is AuthSuccess) {
           context.go(AppRoutes.pendingApproval);
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(

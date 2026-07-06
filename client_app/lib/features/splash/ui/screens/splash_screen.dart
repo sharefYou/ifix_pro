@@ -136,7 +136,7 @@ class _SplashScreenState extends State<SplashScreen>
                       style: TextStyle(
                         fontSize: 64,
                         fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                        color: Color(0xFF161B22),
                         // يجب أن يكون أبيض ليعمل الـ ShaderMask
                         letterSpacing: -1.5,
                       ),
@@ -177,3 +177,6 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
+
+
+

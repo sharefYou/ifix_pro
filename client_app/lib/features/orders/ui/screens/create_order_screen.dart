@@ -1,5 +1,9 @@
+import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:ifix_client/core/api/dio_helper.dart';
 import 'package:ifix_client/core/helpers/extensions.dart';
 import '../../../services/data/models/service_model.dart';
 import '../../manager/orders_cubit.dart';
@@ -14,16 +18,19 @@ class CreateOrderScreen extends StatefulWidget {
 }
 
 class _CreateOrderScreenState extends State<CreateOrderScreen> {
-  static const Color backgroundColor = Color(0xFFFAF5EE);
-  static const Color tertiaryColor = Color(0xFF8C3C3C);
-  static const Color borderColor = Color(0xFFD8D0C8);
-  static const Color textColor = Color(0xFF3A302A);
+  static const Color backgroundColor = Color(0xFF0D1117);
+  static const Color tertiaryColor = Color(0xFF2979FF);
+  static const Color borderColor = Color(0xFF30363D);
+  static const Color textColor = Color(0xFFF0F6FC);
 
   String visitType = 'home';
   String paymentMethod = 'wallet';
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
   final notesController = TextEditingController();
+  String? audioMemoPath;
+  String? videoPath;
+  bool isUploadingMedia = false;
 
   @override
   void dispose() {
@@ -80,7 +87,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: borderColor)),
+                  decoration: BoxDecoration(color: const Color(0xFF161B22), borderRadius: BorderRadius.circular(16), border: Border.all(color: borderColor)),
                   child: Row(
                     children: [
                       Container(
@@ -123,7 +130,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                         borderRadius: BorderRadius.circular(16),
                         child: Container(
                           padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: borderColor)),
+                          decoration: BoxDecoration(color: const Color(0xFF161B22), borderRadius: BorderRadius.circular(16), border: Border.all(color: borderColor)),
                           child: Row(
                             children: [
                               const Icon(Icons.calendar_today, color: tertiaryColor),
@@ -141,7 +148,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                         borderRadius: BorderRadius.circular(16),
                         child: Container(
                           padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: borderColor)),
+                          decoration: BoxDecoration(color: const Color(0xFF161B22), borderRadius: BorderRadius.circular(16), border: Border.all(color: borderColor)),
                           child: Row(
                             children: [
                               const Icon(Icons.access_time, color: tertiaryColor),
@@ -173,11 +180,44 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                   decoration: InputDecoration(
                     hintText: 'وصف المشكلة بدقة أو تعليمات الدخول للمنزل...',
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: const Color(0xFF161B22),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: borderColor)),
                     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: borderColor)),
                   ),
                 ),
+                const SizedBox(height: 16),
+                if (isUploadingMedia)
+                  const Center(child: Padding(padding: EdgeInsets.all(8.0), child: CircularProgressIndicator(color: tertiaryColor)))
+                else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(foregroundColor: audioMemoPath != null ? Colors.green : tertiaryColor, side: BorderSide(color: audioMemoPath != null ? Colors.green : tertiaryColor), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+                          icon: Icon(audioMemoPath != null ? Icons.check_circle : Icons.mic),
+                          label: Text(audioMemoPath != null ? 'تم إرفاق الصوت' : 'إرفاق صوت (Voice)', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                          onPressed: () async {
+                            final picker = ImagePicker();
+                            final file = await picker.pickVideo(source: ImageSource.gallery);
+                            if (file != null) _uploadMediaToS3(file, false);
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(foregroundColor: videoPath != null ? Colors.green : tertiaryColor, side: BorderSide(color: videoPath != null ? Colors.green : tertiaryColor), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+                          icon: Icon(videoPath != null ? Icons.check_circle : Icons.videocam),
+                          label: Text(videoPath != null ? 'تم إرفاق الفيديو' : 'إرفاق فيديو (Video)', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                          onPressed: () async {
+                            final picker = ImagePicker();
+                            final file = await picker.pickVideo(source: ImageSource.gallery);
+                            if (file != null) _uploadMediaToS3(file, true);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 const SizedBox(height: 40),
                 SizedBox(
                   height: 54,
@@ -202,11 +242,13 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                                     notes: notesController.text.trim(),
                                     paymentMethod: paymentMethod,
                                     totalAmount: widget.service.price,
+                                    audioMemoPath: audioMemoPath,
+                                    videoPath: videoPath,
                                   );
                             },
                     child: isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('تأكيد وإرسال الطلب', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                        : const Text('تأكيد وإرسال الطلب', style: TextStyle(fontSize: 18, color: Color(0xFF161B22), fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
@@ -239,4 +281,43 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
       ),
     );
   }
+
+  Future<void> _uploadMediaToS3(XFile file, bool isVideo) async {
+    setState(() => isUploadingMedia = true);
+    try {
+      final presignedRes = await DioHelper.postData(
+        endPoint: '/api/v1/general/media/presigned-url',
+        data: {
+          'file_name': file.name,
+          'file_type': isVideo ? 'video/mp4' : 'audio/mp4',
+          'folder': isVideo ? 'order_videos' : 'order_audio',
+        },
+      );
+      if (presignedRes.statusCode == 200 && presignedRes.data != null) {
+        final uploadUrl = presignedRes.data['upload_url'];
+        final method = presignedRes.data['method'];
+        final filePath = presignedRes.data['file_path'];
+        final Uint8List fileBytes = await file.readAsBytes();
+
+        if (method == 'PUT') {
+          await Dio().put(uploadUrl, data: Stream.fromIterable([fileBytes]), options: Options(headers: {'Content-Type': isVideo ? 'video/mp4' : 'audio/mp4', 'Content-Length': fileBytes.length.toString()}));
+        } else {
+          final formData = FormData.fromMap({'file': MultipartFile.fromBytes(fileBytes, filename: file.name)});
+          await DioHelper.postData(endPoint: '/api/v1/general/media/upload-local?path=${Uri.encodeComponent(filePath)}', data: formData);
+        }
+
+        setState(() {
+          if (isVideo) videoPath = filePath; else audioMemoPath = filePath;
+        });
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(isVideo ? 'تم إرفاق الفيديو بنجاح (Direct-to-S3)' : 'تم إرفاق التسجيل الصوتي بنجاح')));
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فشل رفع الملف، حاول مرة أخرى')));
+    } finally {
+      if (mounted) setState(() => isUploadingMedia = false);
+    }
+  }
 }
+
+
+

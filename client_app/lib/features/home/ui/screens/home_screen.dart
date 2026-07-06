@@ -20,10 +20,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const Color backgroundColor = Color(0xFFFAF5EE);
-  static const Color tertiaryColor = Color(0xFF8C3C3C);
-  static const Color borderColor = Color(0xFFD8D0C8);
-  static const Color textColor = Color(0xFF3A302A);
+  static const Color backgroundColor = Color(0xFF0D1117);
+  static const Color tertiaryColor = Color(0xFF2979FF);
+  static const Color borderColor = Color(0xFF30363D);
+  static const Color textColor = Color(0xFFF0F6FC);
 
   int _currentIndex = 0;
 
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF161B22),
           border: const Border(top: BorderSide(color: borderColor)),
           boxShadow: [BoxShadow(color: textColor.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -4))],
         ),
@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
           currentIndex: _currentIndex,
           onTap: (idx) => setState(() => _currentIndex = idx),
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
+          backgroundColor: const Color(0xFF161B22),
           selectedItemColor: tertiaryColor,
           unselectedItemColor: Colors.grey,
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color(0xFF161B22),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: borderColor),
                 ),
@@ -134,9 +134,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('لديك عطل مخصص ومستعجل؟', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text('لديك عطل مخصص ومستعجل؟', style: TextStyle(color: Color(0xFF161B22), fontSize: 18, fontWeight: FontWeight.bold)),
                           SizedBox(height: 6),
-                          Text('اطرح مناقصة واحصل على عروض أسعار من فنيين معتمدين بالقرب منك في دقائق.', style: TextStyle(color: Colors.white, fontSize: 13, height: 1.4)),
+                          Text('اطرح مناقصة واحصل على عروض أسعار من فنيين معتمدين بالقرب منك في دقائق.', style: TextStyle(color: Color(0xFF161B22), fontSize: 13, height: 1.4)),
                         ],
                       ),
                     ),
@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
-                      child: const Icon(Icons.handyman, color: Colors.white, size: 36),
+                      child: const Icon(Icons.handyman, color: Color(0xFF161B22), size: 36),
                     ),
                   ],
                 ),
@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF161B22),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: borderColor),
           boxShadow: [BoxShadow(color: textColor.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 4))],
@@ -248,3 +248,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+
+

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
@@ -92,3 +92,6 @@ class AppTextStyles {
     color: AppColors.textHint,
   );
 }
+
+
+

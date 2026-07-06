@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ifix_client/core/helpers/extensions.dart';
 import '../../data/models/service_model.dart';
@@ -14,10 +14,10 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  static const Color backgroundColor = Color(0xFFFAF5EE);
-  static const Color tertiaryColor = Color(0xFF8C3C3C);
-  static const Color borderColor = Color(0xFFD8D0C8);
-  static const Color textColor = Color(0xFF3A302A);
+  static const Color backgroundColor = Color(0xFF0D1117);
+  static const Color tertiaryColor = Color(0xFF2979FF);
+  static const Color borderColor = Color(0xFF30363D);
+  static const Color textColor = Color(0xFFF0F6FC);
 
   final searchController = TextEditingController();
 
@@ -98,7 +98,7 @@ class _SearchScreenState extends State<SearchScreen> {
         borderRadius: BorderRadius.circular(12),
         side: const BorderSide(color: borderColor),
       ),
-      tileColor: Colors.white,
+      tileColor: const Color(0xFF161B22),
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(color: tertiaryColor.withValues(alpha: 0.1), shape: BoxShape.circle),
@@ -113,3 +113,6 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 }
+
+
+

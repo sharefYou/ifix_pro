@@ -1,4 +1,4 @@
-import '../data/models/wallet_model.dart';
+﻿import '../data/models/wallet_model.dart';
 
 abstract class WalletStates {}
 
@@ -28,3 +28,6 @@ class TopUpErrorState extends WalletStates {
   final String error;
   TopUpErrorState(this.error);
 }
+
+
+

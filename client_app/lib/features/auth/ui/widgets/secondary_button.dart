@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class SecondaryButton extends StatelessWidget {
   final String text;
@@ -13,7 +13,7 @@ class SecondaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFFC2652A);
-    const Color borderColor = Color(0xFFD8D0C8);
+    const Color borderColor = Color(0xFF30363D);
     
     return OutlinedButton(
       onPressed: onPressed,
@@ -39,3 +39,6 @@ class SecondaryButton extends StatelessWidget {
     );
   }
 }
+
+
+

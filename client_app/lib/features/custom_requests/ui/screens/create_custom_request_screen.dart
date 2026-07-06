@@ -12,10 +12,10 @@ class CreateCustomRequestScreen extends StatefulWidget {
 }
 
 class _CreateCustomRequestScreenState extends State<CreateCustomRequestScreen> {
-  static const Color backgroundColor = Color(0xFFFAF5EE);
-  static const Color tertiaryColor = Color(0xFF8C3C3C);
-  static const Color borderColor = Color(0xFFD8D0C8);
-  static const Color textColor = Color(0xFF3A302A);
+  static const Color backgroundColor = Color(0xFF0D1117);
+  static const Color tertiaryColor = Color(0xFF2979FF);
+  static const Color borderColor = Color(0xFF30363D);
+  static const Color textColor = Color(0xFFF0F6FC);
 
   final descController = TextEditingController();
   DateTime? selectedDate;
@@ -95,7 +95,7 @@ class _CreateCustomRequestScreenState extends State<CreateCustomRequestScreen> {
                     decoration: InputDecoration(
                       hintText: 'مثال: أريد تركيب 4 مكيفات سبليت مع تمديد نحاس في الدور الثاني...',
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: const Color(0xFF161B22),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: borderColor)),
                       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: borderColor)),
                     ),
@@ -108,7 +108,7 @@ class _CreateCustomRequestScreenState extends State<CreateCustomRequestScreen> {
                     borderRadius: BorderRadius.circular(16),
                     child: Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: borderColor)),
+                      decoration: BoxDecoration(color: const Color(0xFF161B22), borderRadius: BorderRadius.circular(16), border: Border.all(color: borderColor)),
                       child: Row(
                         children: [
                           const Icon(Icons.calendar_today, color: tertiaryColor),
@@ -140,7 +140,7 @@ class _CreateCustomRequestScreenState extends State<CreateCustomRequestScreen> {
                             },
                       child: isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('نشر الطلب لتلقي العروض', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                          : const Text('نشر الطلب لتلقي العروض', style: TextStyle(fontSize: 18, color: Color(0xFF161B22), fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -152,3 +152,6 @@ class _CreateCustomRequestScreenState extends State<CreateCustomRequestScreen> {
     );
   }
 }
+
+
+

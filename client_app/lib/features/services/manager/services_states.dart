@@ -1,4 +1,4 @@
-import '../data/models/service_model.dart';
+﻿import '../data/models/service_model.dart';
 
 abstract class ServicesStates {}
 
@@ -28,3 +28,6 @@ class SearchErrorState extends ServicesStates {
   final String error;
   SearchErrorState(this.error);
 }
+
+
+

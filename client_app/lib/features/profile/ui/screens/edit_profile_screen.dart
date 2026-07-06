@@ -14,10 +14,10 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  static const Color backgroundColor = Color(0xFFFAF5EE);
-  static const Color tertiaryColor = Color(0xFF8C3C3C);
-  static const Color borderColor = Color(0xFFD8D0C8);
-  static const Color textColor = Color(0xFF3A302A);
+  static const Color backgroundColor = Color(0xFF0D1117);
+  static const Color tertiaryColor = Color(0xFF2979FF);
+  static const Color borderColor = Color(0xFF30363D);
+  static const Color textColor = Color(0xFFF0F6FC);
 
   late TextEditingController nameController;
   late TextEditingController phoneController;
@@ -127,7 +127,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             },
                       child: isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('حفظ التعديلات', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                          : const Text('حفظ التعديلات', style: TextStyle(fontSize: 18, color: Color(0xFF161B22), fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -146,7 +146,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   InputDecoration _inputDecoration(IconData icon) {
     return InputDecoration(
       filled: true,
-      fillColor: Colors.white,
+      fillColor: const Color(0xFF161B22),
       prefixIcon: Icon(icon, color: tertiaryColor),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: borderColor)),
       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: borderColor)),
@@ -154,3 +154,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 }
+
+
+

@@ -43,6 +43,13 @@ class BidModel {
   final int technicianId;
   final String? technicianName;
   final double price;
+  final double? laborCost;
+  final double? partsCost;
+  final String? notes;
+  final double? counterPrice;
+  final String? counterNotes;
+  final String? counterBy;
+  final String? counterStatus;
   final String status;
   final String? createdAt;
 
@@ -51,6 +58,13 @@ class BidModel {
     required this.technicianId,
     this.technicianName,
     required this.price,
+    this.laborCost,
+    this.partsCost,
+    this.notes,
+    this.counterPrice,
+    this.counterNotes,
+    this.counterBy,
+    this.counterStatus,
     required this.status,
     this.createdAt,
   });
@@ -61,10 +75,20 @@ class BidModel {
       technicianId: json['technician_id'] is int
           ? json['technician_id']
           : int.tryParse(json['technician_id'].toString()) ?? 0,
-      technicianName: json['technician_name']?.toString(),
+      technicianName: json['technician_name']?.toString() ?? (json['technician'] is Map ? json['technician']['name']?.toString() : null),
       price: json['price'] is num ? (json['price'] as num).toDouble() : double.tryParse(json['price'].toString()) ?? 0.0,
+      laborCost: json['labor_cost'] != null ? double.tryParse(json['labor_cost'].toString()) : null,
+      partsCost: json['parts_cost'] != null ? double.tryParse(json['parts_cost'].toString()) : null,
+      notes: json['notes']?.toString(),
+      counterPrice: json['counter_price'] != null ? double.tryParse(json['counter_price'].toString()) : null,
+      counterNotes: json['counter_notes']?.toString(),
+      counterBy: json['counter_by']?.toString(),
+      counterStatus: json['counter_status']?.toString(),
       status: json['status']?.toString() ?? 'pending',
       createdAt: json['created_at']?.toString(),
     );
   }
 }
+
+
+

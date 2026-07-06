@@ -34,9 +34,13 @@ class ApiConstants {
   static const String customRequests = '/api/v1/customer/custom-requests';
   static String customRequestBids(int id) => '/api/v1/customer/custom-requests/$id/bids';
   static String acceptBid(int reqId, int bidId) => '/api/v1/customer/custom-requests/$reqId/bids/$bidId/accept';
+  static String counterOffer(int reqId, int bidId) => '/api/v1/customer/custom-requests/$reqId/bids/$bidId/counter';
 
   // General Endpoints
   static const String cities = '/api/v1/general/cities';
   static const String faqs = '/api/v1/general/faqs';
   static const String contactUs = '/api/v1/general/contact-us';
 }
+
+
+

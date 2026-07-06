@@ -1,4 +1,4 @@
-abstract class AuthStates {}
+﻿abstract class AuthStates {}
 
 class AuthInitState extends AuthStates {}
 
@@ -70,3 +70,6 @@ class ResetPasswordErrorState extends AuthStates {
   final String error;
   ResetPasswordErrorState({required this.error});
 }
+
+
+
