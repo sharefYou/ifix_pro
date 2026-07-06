@@ -1,4 +1,4 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+﻿import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ifix_client/core/api/api_constants.dart';
 import 'package:ifix_client/core/api/dio_helper.dart';
 import 'package:ifix_client/core/helpers/error_handler.dart';
@@ -52,8 +52,8 @@ class OrdersCubit extends Cubit<OrdersStates> {
           'notes': notes ?? '',
           'payment_method': paymentMethod,
           'total_amount': totalAmount,
-          if (audioMemoPath != null) 'audio_memo_path': audioMemoPath,
-          if (videoPath != null) 'video_path': videoPath,
+          'audio_memo_path': ?audioMemoPath,
+          'video_path': ?videoPath,
         },
       );
       final newOrder = OrderModel.fromJson(response.data['order']);
@@ -68,7 +68,10 @@ class OrdersCubit extends Cubit<OrdersStates> {
   Future<void> completeOrder(int orderId) async {
     emit(OrderActionLoadingState());
     try {
-      await DioHelper.postData(endPoint: ApiConstants.completeOrder(orderId), data: {});
+      await DioHelper.postData(
+        endPoint: ApiConstants.completeOrder(orderId),
+        data: {},
+      );
       emit(OrderActionSuccessState('تم تأكيد اكتمال الطلب بنجاح'));
       await fetchMyOrders();
     } catch (e) {
@@ -80,7 +83,10 @@ class OrdersCubit extends Cubit<OrdersStates> {
   Future<void> cancelOrder(int orderId) async {
     emit(OrderActionLoadingState());
     try {
-      await DioHelper.postData(endPoint: ApiConstants.cancelOrder(orderId), data: {});
+      await DioHelper.postData(
+        endPoint: ApiConstants.cancelOrder(orderId),
+        data: {},
+      );
       emit(OrderActionSuccessState('تم إلغاء الطلب بنجاح'));
       await fetchMyOrders();
     } catch (e) {
@@ -112,6 +118,3 @@ class OrdersCubit extends Cubit<OrdersStates> {
     }
   }
 }
-
-
-

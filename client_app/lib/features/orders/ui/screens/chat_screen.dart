@@ -37,7 +37,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _fetchHistory() async {
     try {
-      final res = await DioHelper.getData(endPoint: '/api/v1/general/orders/\${widget.orderId}/chat');
+      final res = await DioHelper.getData(
+        endPoint: '/api/v1/general/orders/\${widget.orderId}/chat',
+      );
       if (res.statusCode == 200 && res.data['data'] != null) {
         final List items = res.data['data'];
         setState(() {
@@ -93,10 +95,7 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       final res = await DioHelper.postData(
         endPoint: '/api/v1/general/orders/\${widget.orderId}/chat',
-        data: {
-          if (text.isNotEmpty) 'message': text,
-          if (imageUrl != null) 'image_url': imageUrl,
-        },
+        data: {if (text.isNotEmpty) 'message': text, 'image_url': ?imageUrl},
       );
 
       if (res.statusCode == 201 && res.data['data'] != null) {
@@ -107,15 +106,23 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     } catch (e) {
       if (kDebugMode) print('[ChatScreen] Send error: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to send message. Please check your connection.')),
+        const SnackBar(
+          content: Text(
+            'Failed to send message. Please check your connection.',
+          ),
+        ),
       );
     }
   }
 
   Future<void> _pickAndUploadImage() async {
     final picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
     if (image == null) return;
 
     setState(() => _isUploadingImage = true);
@@ -157,7 +164,8 @@ class _ChatScreenState extends State<ChatScreen> {
             'file': MultipartFile.fromBytes(fileBytes, filename: image.name),
           });
           await DioHelper.postData(
-            endPoint: '/api/v1/general/media/upload-local?path=${Uri.encodeComponent(filePath)}',
+            endPoint:
+                '/api/v1/general/media/upload-local?path=${Uri.encodeComponent(filePath)}',
             data: formData,
           );
         }
@@ -169,7 +177,9 @@ class _ChatScreenState extends State<ChatScreen> {
       if (kDebugMode) print('[ChatScreen] Direct-to-S3 Upload error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Image upload failed. Please try again.')),
+          const SnackBar(
+            content: Text('Image upload failed. Please try again.'),
+          ),
         );
       }
     } finally {
@@ -179,7 +189,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    ReverbClient.instance.off('App\\Events\\ChatMessageSent', _onMessageReceived);
+    ReverbClient.instance.off(
+      'App\\Events\\ChatMessageSent',
+      _onMessageReceived,
+    );
     ReverbClient.instance.off('ChatMessageSent', _onMessageReceived);
     _messageController.dispose();
     _scrollController.dispose();
@@ -196,7 +209,11 @@ class _ChatScreenState extends State<ChatScreen> {
             CircleAvatar(
               radius: 18,
               backgroundColor: const Color(0xFFEFF6FF),
-              child: const Icon(Icons.person, color: Color(0xFF2563EB), size: 20),
+              child: const Icon(
+                Icons.person,
+                color: Color(0xFF2563EB),
+                size: 20,
+              ),
             ),
             const SizedBox(width: 12),
             Column(
@@ -204,7 +221,11 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Text(
                   widget.recipientName,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E293B),
+                  ),
                 ),
                 const Text(
                   '🟢 Online • Reverb Secure Chat',
@@ -224,98 +245,136 @@ class _ChatScreenState extends State<ChatScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _messages.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey.shade300),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No messages yet. Start conversation with \${widget.recipientName}!',
-                              style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                            ),
-                          ],
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.chat_bubble_outline,
+                          size: 64,
+                          color: Colors.grey.shade300,
                         ),
-                      )
-                    : ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.all(16),
-                        itemCount: _messages.length,
-                        itemBuilder: (context, index) {
-                          final msg = _messages[index];
-                          // Simple check: if sender is customer or technician
-                          final isMe = msg['sender'] != null && msg['sender']['name'] != widget.recipientName;
-                          final text = msg['message'] as String?;
-                          final imageUrl = msg['image_url'] as String?;
-                          final time = msg['created_at'] != null && msg['created_at'].toString().length >= 16
-                              ? msg['created_at'].toString().substring(11, 16)
-                              : '';
+                        const SizedBox(height: 16),
+                        Text(
+                          'No messages yet. Start conversation with \${widget.recipientName}!',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = _messages[index];
+                      // Simple check: if sender is customer or technician
+                      final isMe =
+                          msg['sender'] != null &&
+                          msg['sender']['name'] != widget.recipientName;
+                      final text = msg['message'] as String?;
+                      final imageUrl = msg['image_url'] as String?;
+                      final time =
+                          msg['created_at'] != null &&
+                              msg['created_at'].toString().length >= 16
+                          ? msg['created_at'].toString().substring(11, 16)
+                          : '';
 
-                          return Align(
-                            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: isMe ? const Color(0xFF2563EB) : Colors.white,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: const Radius.circular(16),
-                                  topRight: const Radius.circular(16),
-                                  bottomLeft: isMe ? const Radius.circular(16) : const Radius.circular(4),
-                                  bottomRight: isMe ? const Radius.circular(4) : const Radius.circular(16),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2)),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (imageUrl != null && imageUrl.isNotEmpty) ...[
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: CachedNetworkImage(
-                                        imageUrl: imageUrl,
-                                        placeholder: (context, url) => Container(
-                                          height: 150,
-                                          color: Colors.grey.shade200,
-                                          child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                                        ),
-                                        errorWidget: (context, url, error) => Container(
-                                          height: 150,
-                                          color: Colors.grey.shade200,
-                                          child: const Icon(Icons.broken_image, color: Colors.grey),
-                                        ),
-                                      ),
-                                    ),
-                                    if (text != null && text.isNotEmpty) const SizedBox(height: 8),
-                                  ],
-                                  if (text != null && text.isNotEmpty)
-                                    Text(
-                                      text,
-                                      style: TextStyle(
-                                        color: isMe ? Colors.white : const Color(0xFF1E293B),
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  const SizedBox(height: 4),
-                                  Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: Text(
-                                      time,
-                                      style: TextStyle(
-                                        color: isMe ? Colors.blue.shade100 : const Color(0xFF94A3B8),
-                                        fontSize: 11,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                      return Align(
+                        alignment: isMe
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.75,
+                          ),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: isMe
+                                ? const Color(0xFF2563EB)
+                                : Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(16),
+                              topRight: const Radius.circular(16),
+                              bottomLeft: isMe
+                                  ? const Radius.circular(16)
+                                  : const Radius.circular(4),
+                              bottomRight: isMe
+                                  ? const Radius.circular(4)
+                                  : const Radius.circular(16),
                             ),
-                          );
-                        },
-                      ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (imageUrl != null && imageUrl.isNotEmpty) ...[
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: CachedNetworkImage(
+                                    imageUrl: imageUrl,
+                                    placeholder: (context, url) => Container(
+                                      height: 150,
+                                      color: Colors.grey.shade200,
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                          height: 150,
+                                          color: Colors.grey.shade200,
+                                          child: const Icon(
+                                            Icons.broken_image,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                  ),
+                                ),
+                                if (text != null && text.isNotEmpty)
+                                  const SizedBox(height: 8),
+                              ],
+                              if (text != null && text.isNotEmpty)
+                                Text(
+                                  text,
+                                  style: TextStyle(
+                                    color: isMe
+                                        ? Colors.white
+                                        : const Color(0xFF1E293B),
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              const SizedBox(height: 4),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Text(
+                                  time,
+                                  style: TextStyle(
+                                    color: isMe
+                                        ? Colors.blue.shade100
+                                        : const Color(0xFF94A3B8),
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
 
           if (_isUploadingImage)
@@ -324,9 +383,16 @@ class _ChatScreenState extends State<ChatScreen> {
               color: const Color(0xFFEFF6FF),
               child: const Row(
                 children: [
-                  SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
                   SizedBox(width: 12),
-                  Text('Uploading image directly to cloud (Presigned URL)...', style: TextStyle(fontSize: 13, color: Color(0xFF2563EB))),
+                  Text(
+                    'Uploading image directly to cloud (Presigned URL)...',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF2563EB)),
+                  ),
                 ],
               ),
             ),
@@ -337,7 +403,11 @@ class _ChatScreenState extends State<ChatScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -2)),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
               ],
             ),
             child: SafeArea(
@@ -345,7 +415,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: [
                   IconButton(
                     onPressed: _isUploadingImage ? null : _pickAndUploadImage,
-                    icon: const Icon(Icons.image_outlined, color: Color(0xFF2563EB), size: 26),
+                    icon: const Icon(
+                      Icons.image_outlined,
+                      color: Color(0xFF2563EB),
+                      size: 26,
+                    ),
                     tooltip: 'Send Image',
                   ),
                   Expanded(
@@ -355,11 +429,20 @@ class _ChatScreenState extends State<ChatScreen> {
                       onSubmitted: (_) => _sendMessage(),
                       decoration: InputDecoration(
                         hintText: 'Type a message...',
-                        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                        hintStyle: TextStyle(
+                          color: Colors.grey.shade400,
+                          fontSize: 14,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFFF1F5F9),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
@@ -369,7 +452,11 @@ class _ChatScreenState extends State<ChatScreen> {
                     backgroundColor: const Color(0xFF2563EB),
                     child: IconButton(
                       onPressed: () => _sendMessage(),
-                      icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                      icon: const Icon(
+                        Icons.send,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],
