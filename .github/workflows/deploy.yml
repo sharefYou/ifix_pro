@@ -25,4 +25,4 @@ jobs:
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
           source: "./ifix-pro/*" # يحدد الملفات الموجودة داخل مجلد لارافيل فقط
-          target: "/www" # مسار موقع لارافيل على خادم الاستضافة
+          target: "/home/sharef/www" # مسار موقع لارافيل على خادم الاستضافة
