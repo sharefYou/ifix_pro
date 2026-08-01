@@ -84,6 +84,9 @@ Route::prefix('v1/customer')->middleware([\App\Http\Middleware\SetLocale::class]
 });
 
 Route::prefix('v1/technician')->middleware([\App\Http\Middleware\SetLocale::class])->group(function () {
+    Route::get('/cities', [\App\Http\Controllers\Api\V1\General\GeneralController::class, 'cities']);
+    Route::get('/categories', [\App\Http\Controllers\Api\V1\Customer\ServiceController::class, 'index']);
+
     Route::post('/register', [\App\Http\Controllers\Api\V1\Technician\AuthController::class, 'register'])->middleware('throttle:10,1');
     Route::post('/verify-otp', [\App\Http\Controllers\Api\V1\Technician\AuthController::class, 'verifyOtp'])->middleware('throttle:otp_limiter');
     Route::post('/login', [\App\Http\Controllers\Api\V1\Technician\AuthController::class, 'login'])->middleware('throttle:10,1');
