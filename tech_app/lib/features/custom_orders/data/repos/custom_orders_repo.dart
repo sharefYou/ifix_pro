@@ -37,8 +37,8 @@ class CustomOrdersRepository {
       final dio = await DioFactory.getDio();
       final response = await dio.post('custom-requests/$customRequestId/bids', data: {
         'price': price,
-        if (laborCost != null) 'labor_cost': laborCost,
-        if (partsCost != null) 'parts_cost': partsCost,
+        'labor_cost': ?laborCost,
+        'parts_cost': ?partsCost,
         if (notes != null && notes.isNotEmpty) 'notes': notes,
       });
       final data = (response.data as Map<String, dynamic>)['data'] as Map<String, dynamic>;

@@ -83,38 +83,38 @@
 
 ```mermaid
 graph TD
-    subgraph Clients["تطبيقات المستخدمين (Flutter Apps)"]
-        CA["📱 تطبيق العميل (Client App)"]
-        TA["📱 تطبيق الفني (Tech App)"]
+    subgraph Clients["تطبيقات المستخدمين - Flutter Apps"]
+        CA["📱 تطبيق العميل - Client App"]
+        TA["📱 تطبيق الفني - Tech App"]
     end
 
-    subgraph Backend["الواجهة الخلفية (Laravel 11 & Filament)"]
-        API["⚡ Laravel API (Sanctum Auth)"]
-        REV["📡 Laravel Reverb (WebSockets Server)"]
+    subgraph Backend["الواجهة الخلفية - Laravel 11 and Filament"]
+        API["⚡ Laravel API - Sanctum Auth"]
+        REV["📡 Laravel Reverb - WebSockets Server"]
         FIL["🖥️ Filament Admin Dashboard"]
-        DB[(🗄️ MySQL Database)]
+        DB["🗄️ MySQL Database"]
     end
 
     subgraph Cloud["الخدمات السحابية والتخزين"]
-        S3["☁️ AWS S3 / R2 Cloud Storage"]
+        S3["☁️ AWS S3 and R2 Cloud Storage"]
     end
 
-    CA <-->|HTTP REST / JSON| API
-    TA <-->|HTTP REST / JSON| API
-    FIL <-->|ORM / Livewire| DB
-    API <-->|Eloquent ORM| DB
+    CA <-->|"HTTP REST and JSON"| API
+    TA <-->|"HTTP REST and JSON"| API
+    FIL <-->|"ORM and Livewire"| DB
+    API <-->|"Eloquent ORM"| DB
 
-    CA <-->|Real-time WS / Channels| REV
-    TA <-->|Real-time WS / Channels| REV
-    API -->|Broadcast Events| REV
+    CA <-->|"Real-time WS and Channels"| REV
+    TA <-->|"Real-time WS and Channels"| REV
+    API -->|"Broadcast Events"| REV
 
-    CA -->|1. Request Presigned URL| API
-    API -->|2. Return Signed URL| CA
-    CA ==>|3. Direct Heavy Upload (Audio/Video)| S3
+    CA -->|"1. Request Presigned URL"| API
+    API -->|"2. Return Signed URL"| CA
+    CA -->|"3. Direct Heavy Upload - Audio and Video"| S3
 
-    TA -->|1. Request Presigned URL| API
-    API -->|2. Return Signed URL| TA
-    TA ==>|3. Direct Image/Signature Upload| S3
+    TA -->|"1. Request Presigned URL"| API
+    API -->|"2. Return Signed URL"| TA
+    TA -->|"3. Direct Image and Signature Upload"| S3
 ```
 
 ---
@@ -124,33 +124,33 @@ graph TD
 ```mermaid
 sequenceDiagram
     autonumber
-    actor C as العميل (Customer)
+    actor C as العميل Customer
     participant CA as تطبيق العميل
     participant API as Laravel API
-    participant REV as خادم Reverb (WebSockets)
+    participant REV as خادم Reverb WebSockets
     participant TA as تطبيق الفني
-    actor T as الفني (Technician)
+    actor T as الفني Technician
 
-    C->>CA: اختيار خدمة + إرفاق تسجيل صوتي/فيديو (Direct-to-S3)
-    CA->>API: POST /api/v1/customer/orders (إنشاء الطلب)
+    C->>CA: اختيار خدمة مع إرفاق تسجيل صوتي أو فيديو Direct to S3
+    CA->>API: POST /api/v1/customer/orders إنشاء الطلب
     API->>REV: بث إشعار طلب جديد للفنيين المتاحين
     REV->>TA: إشعار لحظي بالطلب
-    T->>TA: قبول الطلب (Accept Order)
-    TA->>API: POST /api/v1/technician/orders/{id}/accept
-    API->>REV: تحديث حالة الطلب إلى (accepted)
+    T->>TA: قبول الطلب Accept Order
+    TA->>API: POST /api/v1/technician/orders/id/accept
+    API->>REV: تحديث حالة الطلب إلى accepted
 
-    Note over T,CA: بدء مرحلة التوجه للموقع والتتبع الحي (Live GPS Tracking)
-    loop كل 10 ثوانٍ أثناء التحرك
+    Note over T,CA: بدء مرحلة التوجه للموقع والتتبع الحي Live GPS Tracking
+    loop كل 10 ثوان أثناء التحرك
         T->>TA: تحديث إحداثيات GPS في الخلفية
-        TA->>REV: بث إحداثيات (TechnicianLocationUpdated)
-        REV->>CA: تحريك أيقونة الفني على خريطة العميل لحظياً
+        TA->>REV: بث إحداثيات TechnicianLocationUpdated
+        REV->>CA: تحريك أيقونة الفني على خريطة العميل لحظيا
     end
 
-    T->>TA: الوصول للموقع وبدء العمل (In Progress)
+    T->>TA: الوصول للموقع وبدء العمل In Progress
     Note over T,C: إتمام العمل والانتقال لقائمة التحقق الإلزامية
-    T->>TA: إتمام قائمة الفحص + التقاط صور + أخذ توقيع العميل الرقمي
-    TA->>API: POST /api/v1/technician/orders/{id}/complete (إرسال قائمة التحقق والتوقيع)
-    API->>API: التحقق من اكتمال الشروط + خصم الرصيد من الضمان وإيداعه للمحفظة
+    T->>TA: إتمام قائمة الفحص مع التقاط صور وأخذ توقيع العميل الرقمي
+    TA->>API: POST /api/v1/technician/orders/id/complete إرسال قائمة التحقق والتوقيع
+    API->>API: التحقق من اكتمال الشروط وخصم الرصيد من الضمان وإيداعه للمحفظة
     API->>REV: إشعار العميل باكتمال الطلب وإصدار الفاتورة المبسطة
 ```
 
@@ -160,19 +160,19 @@ sequenceDiagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> CustomRequestCreated: العميل ينشئ طلب مخصص (مع مرفقات صوت/فيديو)
-    CustomRequestCreated --> BidsSubmitted: الفنيون يقدمون عروض أسعار (أجرة يد + قطع غيار)
+    [*] --> CustomRequestCreated: العميل ينشئ طلب مخصص مع مرفقات صوت وفيديو
+    CustomRequestCreated --> BidsSubmitted: الفنيون يقدمون عروض أسعار أجرة يد وقطع غيار
     
     state BidsSubmitted {
         [*] --> ReviewingBids
-        ReviewingBids --> CounterOfferSent: العميل يرسل عرض مضاد (تعديل السعر)
+        ReviewingBids --> CounterOfferSent: العميل يرسل عرض مضاد لتعديل السعر
         CounterOfferSent --> TechUpdatedBid: الفني يقبل أو يعدل العرض المضاد
         TechUpdatedBid --> ReviewingBids
     }
 
     BidsSubmitted --> BidAccepted: العميل يقبل العرض الأفضل
-    BidAccepted --> EscrowLocked: تجميد إجمالي المبلغ في رصيد الضمان (held_balance)
-    EscrowLocked --> OrderConverted: تحويل المناقصة إلى طلب عمل نشط (Active Order)
+    BidAccepted --> EscrowLocked: تجميد إجمالي المبلغ في رصيد الضمان held_balance
+    EscrowLocked --> OrderConverted: تحويل المناقصة إلى طلب عمل نشط Active Order
     OrderConverted --> [*]
 ```
 
@@ -182,20 +182,124 @@ stateDiagram-v2
 
 ```mermaid
 flowchart TD
-    A[بدء تنفيذ الطلب] --> B[تجميد المبلغ في ضمان المنصة<br/>held_balance]
-    B --> C{هل واجه العميل أو الفني<br/>مشكلة أثناء العمل؟}
+    A["بدء تنفيذ الطلب"] --> B["تجميد المبلغ في ضمان المنصة held balance"]
+    B --> C{"هل واجه العميل أو الفني مشكلة أثناء العمل؟"}
     
-    C -->|لا (مسار طبيعي)| D[إتمام العمل + التوقيع الرقمي]
-    D --> E[تحرير الرصيد تلقائياً<br/>إيداع في محفظة الفني ✅]
+    C -->|"لا - مسار طبيعي"| D["إتمام العمل والتوقيع الرقمي"]
+    D --> E["تحرير الرصيد تلقائيا وإيداع في محفظة الفني"]
     
-    C -->|نعم (فتح نزاع)| F[إرسال شكوى رسمية + أدلة وسائط<br/>POST /api/v1/general/orders/id/dispute]
-    F --> G[تجميد الطلب في حالة DISPUTED<br/>منع أي تحويل مالي تلقائي]
-    G --> H[ظهور القضية في مركز فض النزاعات<br/>Filament Dispute Resolution Center ⚖️]
+    C -->|"نعم - فتح نزاع"| F["إرسال شكوى رسمية مع أدلة وسائط"]
+    F --> G["تجميد الطلب في حالة DISPUTED ومنع أي تحويل مالي تلقائي"]
+    G --> H["ظهور القضية في مركز فض النزاعات Filament Dispute Resolution Center"]
     
-    H --> I{قرار لجنة التحكيم الإدارية}
-    I -->|الحكم لصالح العميل ↩️| J[استرداد كامل الرصيد لمحافظة العميل<br/>إلغاء الطلب CANCELED]
-    I -->|الحكم لصالح الفني ✅| K[صرف المستحقات لمحفظة الفني<br/>اعتماد اكتمال الطلب COMPLETED]
-    I -->|تسوية ودية مشتركة 🤝| L[تقاسم المبلغ حسب التقدير الفني]
+    H --> I{"قرار لجنة التحكيم الإدارية"}
+    I -->|"الحكم لصالح العميل"| J["استرداد كامل الرصيد لمحافظة العميل وإلغاء الطلب CANCELED"]
+    I -->|"الحكم لصالح الفني"| K["صرف المستحقات لمحفظة الفني واعتماد اكتمال الطلب COMPLETED"]
+    I -->|"تسوية ودية مشتركة"| L["تقاسم المبلغ حسب التقدير الفني"]
+```
+
+---
+
+### 🔹 5. مخطط محرك التوجيه الذكي بالذكاء الاصطناعي (AI Dispatching Engine Flow)
+
+```mermaid
+flowchart TD
+    A["طلب جديد يحتاج تعيين فني"] --> B["جلب جميع الفنيين المتصلين في نفس النطاق الجغرافي"]
+    B --> C["حساب درجة الملاءمة لكل فني Score Calculation"]
+    
+    C --> D1["المسافة الجغرافية - 40%"]
+    C --> D2["تقييم العملاء - 30%"]
+    C --> D3["عبء العمل الحالي - 20%"]
+    C --> D4["سنوات الخبرة والإنجاز - 10%"]
+    
+    D1 & D2 & D3 & D4 --> E["ترتيب الفنيين تنازليا حسب الدرجة الإجمالية"]
+    E --> F{"هل الفني صاحب أعلى درجة متاح؟"}
+    
+    F -->|"نعم - إرسال الطلب"| G["تعيين الطلب تلقائيا وبث إشعار Reverb"]
+    F -->|"لا - مشغول أو رفض"| H["الانتقال إلى الفني التالي في القائمة"]
+    H --> F
+```
+
+---
+
+### 🔹 6. مخطط الرفع المباشر للوسائط إلى السحابة (Direct-to-S3 Presigned URL Flow)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant App as تطبيق الفلتر عميل أو فني
+    participant API as خادم Laravel API
+    participant S3 as التخزين السحابي AWS S3 أو R2
+
+    App->>API: POST /api/v1/general/media/presigned-url طلب رابط موقع
+    API->>API: التحقق من صلاحيات Sanctum ونوع الملف
+    API-->>App: إرجاع رابط الرفع المؤقت upload_url ومسار الملف file_path
+    Note over App,S3: الرفع المباشر دون استهلاك ذاكرة أو نطاق خادم Laravel
+    App->>S3: PUT / upload_url إرسال بيانات الملف مباشرة إلى السحابة
+    S3-->>App: 200 OK نجاح الرفع
+    App->>API: إرسال الطلب أو الرسالة مع إرفاق مسار الملف فقط file_path
+```
+
+---
+
+### 🔹 7. مخطط حاسبة التكلفة والتسعير الديناميكي (Smart Cost Calculator & Surge Pricing Flow)
+
+```mermaid
+flowchart LR
+    A["اختيار الخدمة الأساسية Base Price"] --> B{"هل يوجد تسعير ذروة نشط؟ Surge Pricing"}
+    B -->|"نعم - وقت ذروة"| C["ضرب السعر في معامل الذروة 1.5x"]
+    B -->|"لا - وقت عادي"| D["اعتماد السعر الأساسي"]
+    
+    C & D --> E{"نوع الزيارة Visit Type"}
+    E -->|"زيارة عادية Normal"| F["بدون زيادة 1.0x"]
+    E -->|"زيارة عاجلة Urgent"| G["زيادة استعجال 1.3x"]
+    E -->|"طوارئ SOS Emergency"| H["زيادة طوارئ 1.6x"]
+    
+    F & G & H --> I{"هل العميل مشترك في باقة VIP؟"}
+    I -->|"نعم - خصم مميز"| J["تطبيق خصم 15% على الإجمالي"]
+    I -->|"لا"| K["الإجمالي النهائي للفاتورة المبسطة"]
+    J --> K
+```
+
+---
+
+### 🔹 8. مخطط دورة المحفظة المالية وسحب الأرصدة (Wallet Ledger & Payout Flow)
+
+```mermaid
+stateDiagram-v2
+    [*] --> AvailableBalance: رصيد متاح في المحفظة
+    
+    state AvailableBalance {
+        [*] --> RechargeCard: شحن عبر بطاقة شحن
+        [*] --> EscrowLock: حجز مبلغ لطلب عمل جديد
+        [*] --> PayoutRequest: تقديم طلب سحب رصيد نقدي
+    }
+    
+    EscrowLock --> HeldBalance: نقل المبلغ إلى الرصيد المحجوز
+    HeldBalance --> AvailableBalance: تحرير الرصيد للفني عند اكتمال العمل بنجاح
+    HeldBalance --> CustomerRefund: استرداد للعميل عند إلغاء الطلب أو كسب النزاع
+    
+    PayoutRequest --> AdminReview: مراجعة الإدارة في لوحة Filament
+    AdminReview --> CashOutApproved: اعتماد السحب وخصم المبلغ نهائيا
+    AdminReview --> CashOutRejected: رفض السحب وإعادة المبلغ للرصيد المتاح
+```
+
+---
+
+### 🔹 9. مخطط قائمة التحقق الإلزامية والتوقيع الرقمي (Digital Checklist & Signature Flow)
+
+```mermaid
+flowchart TD
+    A["الفني ينهي أعمال الصيانة في الموقع"] --> B["فتح شاشة قائمة التحقق الإلزامية OrderChecklistScreen"]
+    B --> C["فحص وتأكيد 4 إقرارات سلامة إلزامية"]
+    C --> D["التقاط صورة قبل الإصلاح Before Photo"]
+    D --> E["التقاط صورة بعد الإصلاح After Photo"]
+    E --> F["توقيع العميل على شاشة اللمس Touch Signature Pad"]
+    F --> G{"هل جميع العناصر مكتملة والتوقيع موجود؟"}
+    
+    G -->|"لا"| H["تنبيه باللون الأحمر ومنع إغلاق الطلب"]
+    G -->|"نعم"| I["رفع الصور والتوقيع مباشرة إلى S3 وإرسال الاعتماد إلى Laravel"]
+    I --> J["إصدار الفاتورة المبسطة وتحويل الرصيد للمحفظة"]
 ```
 
 ---

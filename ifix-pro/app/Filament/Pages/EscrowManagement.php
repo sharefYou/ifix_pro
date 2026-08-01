@@ -37,7 +37,7 @@ class EscrowManagement extends Page
 
     public function getTotalAvailableProperty()
     {
-        return Wallet::sum('balance');
+        return Wallet::sum('available_balance');
     }
 
     public function getEscrowWalletsProperty()
@@ -55,7 +55,7 @@ class EscrowManagement extends Page
             if ($wallet && $wallet->held_balance > 0) {
                 $amount = $wallet->held_balance;
                 $wallet->decrement('held_balance', $amount);
-                $wallet->increment('balance', $amount);
+                $wallet->increment('available_balance', $amount);
 
                 WalletTransaction::create([
                     'wallet_id' => $wallet->id,
@@ -67,8 +67,8 @@ class EscrowManagement extends Page
                 ]);
 
                 Notification::make()
-                    ->title('تم تحرير مبلغ الضمان بنجاح')
-                    ->body("تم تحرير {$amount} ريال إلى الرصيد المتاح للمستخدم {$wallet->user->name}")
+                    ->title('✅ تم تحرير مبلغ الضمان بنجاح')
+                    ->body("تم تحرير {$amount} ريال من الرصيد المحجوز إلى الرصيد المتاح لـ {$wallet->user->name}")
                     ->success()
                     ->send();
             }
@@ -82,7 +82,7 @@ class EscrowManagement extends Page
             if ($wallet && $wallet->held_balance > 0) {
                 $amount = $wallet->held_balance;
                 $wallet->decrement('held_balance', $amount);
-                $wallet->increment('balance', $amount); // Refund back to user's available balance
+                $wallet->increment('available_balance', $amount); // Refund back to user's available balance
 
                 WalletTransaction::create([
                     'wallet_id' => $wallet->id,
@@ -94,8 +94,8 @@ class EscrowManagement extends Page
                 ]);
 
                 Notification::make()
-                    ->title('تم استرداد مبلغ الضمان بنجاح')
-                    ->body("تم استرداد {$amount} ريال إلى رصيد العميل {$wallet->user->name}")
+                    ->title('↩️ تم استرداد مبلغ الضمان بنجاح')
+                    ->body("تم استرداد {$amount} ريال من الرصيد المحجوز وإعادته للرصيد المتاح لـ {$wallet->user->name}")
                     ->success()
                     ->send();
             }

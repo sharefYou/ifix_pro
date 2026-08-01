@@ -11,7 +11,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Notifications\Notification;
@@ -111,7 +111,7 @@ class DisputeResource extends Resource
                             if ($wallet && $wallet->held_balance >= $order->total_amount) {
                                 $amount = (float) $order->total_amount;
                                 $wallet->decrement('held_balance', $amount);
-                                $wallet->increment('balance', $amount);
+                                $wallet->increment('available_balance', $amount);
 
                                 WalletTransaction::create([
                                     'wallet_id' => $wallet->id,
@@ -148,7 +148,7 @@ class DisputeResource extends Resource
                     DB::transaction(function () use ($record) {
                         $order = $record->order;
                         if ($order && $order->technician_id) {
-                            $techWallet = Wallet::firstOrCreate(['user_id' => $order->technician_id], ['balance' => 0, 'held_balance' => 0]);
+                            $techWallet = Wallet::firstOrCreate(['user_id' => $order->technician_id], ['available_balance' => 0, 'held_balance' => 0]);
                             $customerWallet = Wallet::where('user_id', $order->user_id)->lockForUpdate()->first();
 
                             $amount = (float) $order->total_amount;
@@ -156,7 +156,7 @@ class DisputeResource extends Resource
                                 $customerWallet->decrement('held_balance', $amount);
                             }
 
-                            $techWallet->increment('balance', $amount);
+                            $techWallet->increment('available_balance', $amount);
 
                             WalletTransaction::create([
                                 'wallet_id' => $techWallet->id,
