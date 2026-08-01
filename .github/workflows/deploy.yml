@@ -1,0 +1,28 @@
+name: Deploy Laravel App Only
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      # هذا الشرط يضمن أن الـ Action لن يعمل إلا إذا حدث تغيير داخل مجلد لارافيل فقط
+      - 'ifix-pro/**' # (استبدل laravel-app بالاسم الحقيقي للمجلد في مستودعك)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # الخطوة الأولى: جلب الكود من المستودع
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # الخطوة الثانية: رفع محتويات مجلد لارافيل فقط عبر SFTP
+      - name: Copy Laravel files via SFTP
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port: ${{ secrets.SFTP_PORT }}
+          source: "./ifix-pro/*" # يحدد الملفات الموجودة داخل مجلد لارافيل فقط
+          target: "/www" # مسار موقع لارافيل على خادم الاستضافة
