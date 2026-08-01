@@ -93,12 +93,13 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       final dio = await DioFactory.getDio(customBaseUrl: 'https://sharef.alwaysdata.net');
+      final Map<String, dynamic> data = {};
+      if (text.isNotEmpty) data['message'] = text;
+      if (imageUrl != null) data['image_url'] = imageUrl;
+
       final res = await dio.post(
         '/api/v1/general/orders/\${widget.orderId}/chat',
-        data: {
-          if (text.isNotEmpty) 'message': text,
-          if (imageUrl != null) 'image_url': imageUrl,
-        },
+        data: data,
       );
 
       if (res.statusCode == 201 && res.data['data'] != null) {
@@ -109,6 +110,7 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     } catch (e) {
       if (kDebugMode) print('[ChatScreen] Send error: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to send message. Please check your connection.')),
       );

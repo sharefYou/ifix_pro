@@ -85,7 +85,7 @@ Route::prefix('v1/customer')->middleware([\App\Http\Middleware\SetLocale::class]
 
 Route::prefix('v1/technician')->middleware([\App\Http\Middleware\SetLocale::class])->group(function () {
     Route::get('/cities', [\App\Http\Controllers\Api\V1\General\GeneralController::class, 'cities']);
-    Route::get('/categories', [\App\Http\Controllers\Api\V1\Customer\ServiceController::class, 'index']);
+    Route::get('/categories', [ServiceController::class, 'index']);
 
     Route::post('/register', [\App\Http\Controllers\Api\V1\Technician\AuthController::class, 'register'])->middleware('throttle:10,1');
     Route::post('/verify-otp', [\App\Http\Controllers\Api\V1\Technician\AuthController::class, 'verifyOtp'])->middleware('throttle:otp_limiter');
@@ -107,8 +107,8 @@ Route::prefix('v1/technician')->middleware([\App\Http\Middleware\SetLocale::clas
             Route::post('/{order}/checklist', [\App\Http\Controllers\Api\V1\Technician\OrderChecklistController::class, 'store']);
         });
 
-        Route::post('/tracking/location', [\App\Http\Controllers\Api\V1\Technician\TrackingController::class, 'updateLocation'])->middleware('throttle:30,1');
-        Route::post('/tracking/broadcast', [\App\Http\Controllers\Api\V1\Technician\TrackingController::class, 'broadcastLocation'])->middleware('throttle:60,1');
+        Route::post('/tracking/location', [TrackingController::class, 'updateLocation'])->middleware('throttle:30,1');
+        Route::post('/tracking/broadcast', [TrackingController::class, 'broadcastLocation'])->middleware('throttle:60,1');
 
         Route::prefix('custom-requests')->group(function () {
             Route::get('/available', [\App\Http\Controllers\Api\V1\Technician\CustomRequestController::class, 'available']);
