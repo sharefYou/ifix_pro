@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/constants/app_colors.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;
@@ -14,17 +15,15 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFFC2652A);
-    
     return ElevatedButton(
       onPressed: isLoading ? () {} : onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: primaryColor,
-        foregroundColor: const Color(0xFF161B22),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
         elevation: 0,
         padding: const EdgeInsets.symmetric(vertical: 18),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
       child: isLoading
@@ -32,7 +31,7 @@ class PrimaryButton extends StatelessWidget {
               height: 24,
               width: 24,
               child: CircularProgressIndicator(
-                color: Color(0xFF161B22),
+                color: Colors.white,
                 strokeWidth: 2.5,
               ),
             )
@@ -42,12 +41,10 @@ class PrimaryButton extends StatelessWidget {
                 fontFamily: 'Cairo',
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
+                color: Colors.white,
                 letterSpacing: 0.5,
               ),
             ),
     );
   }
 }
-
-
-

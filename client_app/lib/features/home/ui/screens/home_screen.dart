@@ -20,10 +20,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const Color backgroundColor = Color(0xFF0D1117);
-  static const Color tertiaryColor = Color(0xFF2979FF);
-  static const Color borderColor = Color(0xFF30363D);
-  static const Color textColor = Color(0xFFF0F6FC);
+  static const Color backgroundColor = Color(0xFFF7F9FC);
+  static const Color tertiaryColor = Color(0xFF1565C0);
+  static const Color borderColor = Color(0xFFDDE4EF);
+  static const Color textColor = Color(0xFF1A2332);
 
   int _currentIndex = 0;
 

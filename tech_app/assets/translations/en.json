@@ -75,5 +75,12 @@
   "login_subtitle": "Enter your details to continue providing services",
   "no_account": "Don't have an account? ",
   "sign_in": "Sign In",
-  "language": "Language"
+  "language": "Language",
+  "verify_otp": "Verify OTP",
+  "enter_otp_code": "Enter OTP Code",
+  "otp_sent_to": "OTP sent to",
+  "otp_code": "OTP Code",
+  "resend_otp": "Resend OTP",
+  "verify": "Verify",
+  "required_field": "Required field"
 }

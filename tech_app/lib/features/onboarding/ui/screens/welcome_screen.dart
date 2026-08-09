@@ -70,7 +70,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF0D1117), Color(0xFF0A1628)],
+                colors: [Color(0xFFEFF4FB), Color(0xFFF7F9FC)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -83,7 +83,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   alignment: Alignment.topLeft,
                   child: TextButton(
                     onPressed: () => context.go(AppRoutes.login),
-                    child: const Text('تخطي', style: TextStyle(color: AppColors.accent, fontFamily: 'Cairo')),
+                    child: const Text('تخطي', style: TextStyle(color: AppColors.primary, fontFamily: 'Cairo', fontWeight: FontWeight.w600)),
                   ),
                 ),
                 Expanded(
@@ -109,7 +109,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             width: i == _current ? 24 : 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: i == _current ? AppColors.accent : AppColors.border,
+                              color: i == _current ? AppColors.primary : AppColors.border,
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -134,7 +134,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             const Text('لديك حساب بالفعل؟ ', style: TextStyle(fontFamily: 'Cairo')),
                             TextButton(
                               onPressed: () => context.go(AppRoutes.login),
-                              child: const Text('تسجيل الدخول', style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
+                              child: const Text('تسجيل الدخول', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
                             ),
                           ],
                         ),

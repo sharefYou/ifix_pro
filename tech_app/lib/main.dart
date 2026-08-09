@@ -23,9 +23,9 @@ void main() async {
   ]);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-    systemNavigationBarColor: Color(0xFF0D1117),
-    systemNavigationBarIconBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarColor: Color(0xFFFFFFFF),
+    systemNavigationBarIconBrightness: Brightness.dark,
   ));
 
   runApp(
@@ -54,7 +54,7 @@ class IFixTechApp extends StatelessWidget {
       child: MaterialApp.router(
         title: 'iFix-Tech',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.darkTheme,
+        theme: AppTheme.lightTheme,
         routerConfig: AppRouter.router,
         locale: context.locale,
         supportedLocales: context.supportedLocales,

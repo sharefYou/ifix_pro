@@ -7,30 +7,36 @@ import '../constants/app_constants.dart';
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get darkTheme {
+  static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       fontFamily: 'Cairo',
       scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.accent,
+      colorScheme: const ColorScheme.light(
+        primary: AppColors.primary,
         secondary: AppColors.gold,
         surface: AppColors.surface,
         error: AppColors.error,
         onPrimary: Colors.white,
-        onSecondary: Colors.black,
+        onSecondary: Colors.white,
         onSurface: AppColors.textPrimary,
         onError: Colors.white,
       ),
 
       // AppBar
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.surface,
         elevation: 0,
-        scrolledUnderElevation: 0,
+        scrolledUnderElevation: 0.5,
         centerTitle: true,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
+        shadowColor: AppColors.border,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          systemNavigationBarColor: AppColors.surface,
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
         titleTextStyle: AppTextStyles.headlineMedium.copyWith(
           color: AppColors.textPrimary,
         ),
@@ -40,14 +46,14 @@ class AppTheme {
       // Elevated Button
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.accent,
+          backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           elevation: 0,
           minimumSize: const Size(double.infinity, 54),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppConstants.radiusMD),
           ),
-          textStyle: AppTextStyles.labelLarge.copyWith(fontSize: 16),
+          textStyle: AppTextStyles.labelLarge.copyWith(fontSize: 16, color: Colors.white),
           padding: const EdgeInsets.symmetric(horizontal: 24),
         ),
       ),
@@ -55,8 +61,8 @@ class AppTheme {
       // Outlined Button
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.accent,
-          side: const BorderSide(color: AppColors.accent, width: 1.5),
+          foregroundColor: AppColors.primary,
+          side: const BorderSide(color: AppColors.primary, width: 1.5),
           minimumSize: const Size(double.infinity, 54),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppConstants.radiusMD),
@@ -68,7 +74,7 @@ class AppTheme {
       // Text Button
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.accent,
+          foregroundColor: AppColors.primary,
           textStyle: AppTextStyles.labelMedium,
         ),
       ),
@@ -88,7 +94,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusMD),
-          borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusMD),
@@ -98,11 +104,11 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppConstants.radiusMD),
           borderSide: const BorderSide(color: AppColors.error, width: 1.5),
         ),
-        hintStyle: AppTextStyles.bodyMedium,
+        hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
         errorStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.error),
         labelStyle: AppTextStyles.bodyMedium,
         floatingLabelStyle: const TextStyle(
-          color: AppColors.accent,
+          color: AppColors.primary,
           fontFamily: 'Cairo',
         ),
         prefixIconColor: AppColors.textSecondary,
@@ -115,9 +121,10 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusLG),
-          side: const BorderSide(color: AppColors.border, width: 0.5),
+          side: const BorderSide(color: AppColors.border, width: 0.8),
         ),
         margin: EdgeInsets.zero,
+        shadowColor: Colors.transparent,
       ),
 
       // Bottom Sheet
@@ -131,6 +138,17 @@ class AppTheme {
         ),
       ),
 
+      // Bottom Navigation Bar
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.surface,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textSecondary,
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,
+        selectedLabelStyle: TextStyle(fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w600),
+        unselectedLabelStyle: TextStyle(fontFamily: 'Cairo', fontSize: 12),
+      ),
+
       // Divider
       dividerTheme: const DividerThemeData(
         color: AppColors.divider,
@@ -141,12 +159,20 @@ class AppTheme {
       // Chip
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceVariant,
-        selectedColor: AppColors.accent.withValues(alpha: 0.2),
+        selectedColor: AppColors.primary.withValues(alpha: 0.15),
         labelStyle: AppTextStyles.bodySmall,
         side: const BorderSide(color: AppColors.border),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusSM),
         ),
+      ),
+
+      // FloatingActionButton
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 4,
+        shape: CircleBorder(),
       ),
 
       // Text Theme

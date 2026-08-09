@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ifix_client/core/helpers/extensions.dart';
 import 'package:ifix_client/features/auth/manager/auth_cubit.dart';
@@ -23,12 +23,12 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  static const Color backgroundColor = Color(0xFF0D1117);
-  static const Color tertiaryColor = Color(0xFF2979FF);
-  static const Color borderColor = Color(0xFF30363D);
+  static const Color backgroundColor = Color(0xFFF7F9FC);
+  static const Color tertiaryColor = Color(0xFF1565C0);
+  static const Color borderColor = Color(0xFFDDE4EF);
   static const Color surfaceColor = Colors.white;
   static const Color shadowColor = Color(0x0A3A302A);
-  static const Color textColor = Color(0xFFF0F6FC);
+  static const Color textColor = Color(0xFF1A2332);
 
   final otpController = TextEditingController();
 

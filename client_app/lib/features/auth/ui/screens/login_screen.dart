@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ifix_client/core/helpers/extensions.dart';
 import 'package:ifix_client/features/auth/manager/auth_cubit.dart';
@@ -19,14 +19,13 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   // Exact Colors from design.md
-  static const Color backgroundColor = Color(0xFF0D1117); // Warm linen
-  static const Color tertiaryColor = Color(0xFF2979FF); // Dusty rose
-  static const Color borderColor = Color(0xFF30363D); // Warm gray border
+  static const Color backgroundColor = Color(0xFFF7F9FC);
+  static const Color tertiaryColor = Color(0xFF1565C0);
+  static const Color borderColor = Color(0xFFDDE4EF);
 
-  // Implied Colors from design.md
   static const Color surfaceColor = Colors.white;
-  static const Color shadowColor = Color(0x0A3A302A); // rgba(58, 48, 42, 0.04)
-  static const Color textColor = Color(0xFFF0F6FC);
+  static const Color shadowColor = Color(0x0A3A302A);
+  static const Color textColor = Color(0xFF1A2332);
 
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();

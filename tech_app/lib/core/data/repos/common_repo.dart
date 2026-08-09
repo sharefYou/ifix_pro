@@ -7,6 +7,7 @@ class CommonRepository {
       final response = await dio.get('cities');
       return response.data['data'];
     } catch (e) {
+
       throw e.toString();
     }
   }

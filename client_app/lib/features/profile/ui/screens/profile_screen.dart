@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ifix_client/core/helpers/cache_helper.dart';
 import 'package:ifix_client/core/helpers/extensions.dart';
@@ -15,10 +15,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  static const Color backgroundColor = Color(0xFF0D1117);
-  static const Color tertiaryColor = Color(0xFF2979FF);
-  static const Color borderColor = Color(0xFF30363D);
-  static const Color textColor = Color(0xFFF0F6FC);
+  static const Color backgroundColor = Color(0xFFF7F9FC);
+  static const Color tertiaryColor = Color(0xFF1565C0);
+  static const Color borderColor = Color(0xFFDDE4EF);
+  static const Color textColor = Color(0xFF1A2332);
 
   @override
   void initState() {

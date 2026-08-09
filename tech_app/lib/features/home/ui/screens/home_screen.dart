@@ -108,9 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
       type: BottomNavigationBarType.fixed,
-      backgroundColor: AppColors.background,
-      selectedItemColor: AppColors.accent,
-      unselectedItemColor: AppColors.textSecondary,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home_rounded),
@@ -189,31 +186,28 @@ class _HomeContentState extends State<_HomeContent> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.gold.withValues(alpha: 0.2),
-                      AppColors.accent.withValues(alpha: 0.1),
-                    ],
-                  ),
+                  color: AppColors.surfaceVariant,
                   borderRadius: BorderRadius.circular(AppConstants.radiusMD),
-                  border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.analytics_rounded, color: AppColors.gold, size: 24),
-                    SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(AppConstants.radiusSM),
+                      ),
+                      child: const Icon(Icons.analytics_rounded, color: AppColors.primary, size: 20),
+                    ),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'لوحة التحليلات المالية والأداء (الرسوم البيانية 📈)',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          fontFamily: 'Cairo',
-                        ),
+                        'لوحة التحليلات المالية والأداء 📈',
+                        style: AppTextStyles.headlineSmall.copyWith(fontSize: 13),
                       ),
                     ),
-                    Icon(Icons.arrow_forward_ios_rounded, color: AppColors.gold, size: 16),
+                    const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.primary, size: 16),
                   ],
                 ),
               ),
@@ -365,16 +359,23 @@ class _HomeContentState extends State<_HomeContent> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.05),
+        color: AppColors.error.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(AppConstants.radiusLG),
         border: Border.all(color: AppColors.error.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
-          const Icon(
-            Icons.power_settings_new_rounded,
-            color: AppColors.error,
-            size: 48,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.error.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.power_settings_new_rounded,
+              color: AppColors.error,
+              size: 40,
+            ),
           ),
           const SizedBox(height: 16),
           Text(
@@ -384,10 +385,10 @@ class _HomeContentState extends State<_HomeContent> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'لن تستقبل أي طلبات جديدة حتى تقوم بتغيير حالتك إلى "متصل"',
             textAlign: TextAlign.center,
-            style: TextStyle(fontFamily: 'Cairo'),
+            style: AppTextStyles.bodyMedium,
           ),
         ],
       ),

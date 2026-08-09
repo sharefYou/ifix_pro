@@ -79,6 +79,70 @@
 
 ## 📊 3. مخططات العمل والتدفق (Mermaid Workflows & Diagrams)
 
+### 🔹 0. المخطط الصندوقي الشامل للنظام (System Block Diagram)
+
+```mermaid
+flowchart TB
+    subgraph ClientLayer ["📱 طبقة التطبيقات المباشرة - Client Layer"]
+        subgraph CustomerApp ["تطبيق العملاء - Flutter Client"]
+            C_UI["واجهة العميل UI/UX"]
+            C_Bloc["إدارة الحالة Cubit/Bloc"]
+            C_Services["الخدمات الحية GPS/WS/Dio"]
+        end
+
+        subgraph TechApp ["تطبيق الفنيين - Flutter Tech"]
+            T_UI["واجهة الفني UI/UX"]
+            T_Bloc["إدارة العمليات والعروض Cubit"]
+            T_Tools["أدوات الميدان GPS/Checklist/Signature"]
+        end
+    end
+
+    subgraph APIGateway ["🔌 طبقة الربط والمصادقة - API and Gateway Layer"]
+        Sanctum["نظام المصادقة والتأمين Laravel Sanctum"]
+        Locale["مبدل اللغات والمواقع SetLocale Middleware"]
+        MediaGateway["محرك الروابط السحابية المؤقتة Presigned URL Engine"]
+    end
+
+    subgraph CoreBackend ["⚙️ طبقة الخدمات المركزية - Core Backend Services"]
+        OrderMgmt["إدارة الطلبات والخدمات Order Engine"]
+        BiddingEngine["محرك المناقصات والسوق المفتوح Bidding Engine"]
+        DispatchEngine["محرك التوجيه الذكي AI Dispatcher"]
+        EscrowEngine["محرك المحفظة والضمان المالي Escrow and Wallet Ledger"]
+    end
+
+    subgraph AdminLayer ["🖥️ طبقة الإدارة والتشغيل - Admin and Operations Layer"]
+        FilamentDashboard["لوحة التحكم Filament Admin"]
+        LiveBoard["شاشة الفرز والمراقبة الحية Live Dispatch Board"]
+        ArbitrationCenter["مركز فض النزاعات والتحكيم Dispute Center"]
+        EscrowAdmin["شاشة الرقابة المالية Escrow Management"]
+    end
+
+    subgraph Infrastructure ["☁️ البنية التحتية والخوادم - Infrastructure Layer"]
+        Database[("قاعدة البيانات الرئيسية MySQL ORM")]
+        ReverbServer["خادم البث اللحظي Laravel Reverb WebSockets"]
+        S3Storage["التخزين السحابي AWS S3 / Cloudflare R2"]
+    end
+
+    CustomerApp <-->|"REST API"| APIGateway
+    TechApp <-->|"REST API"| APIGateway
+    CustomerApp <-->|"WebSockets"| ReverbServer
+    TechApp <-->|"WebSockets"| ReverbServer
+
+    CustomerApp -->|"Direct Heavy Upload"| S3Storage
+    TechApp -->|"Direct Signature and Media Upload"| S3Storage
+
+    APIGateway --> CoreBackend
+    CoreBackend <--> Database
+    CoreBackend -->|"Broadcast Events"| ReverbServer
+
+    AdminLayer <--> FilamentDashboard
+    FilamentDashboard <--> Database
+    FilamentDashboard --> DispatchEngine
+    FilamentDashboard --> ArbitrationCenter
+```
+
+---
+
 ### 🔹 1. مخطط المعمارية العامة والاتصال (System Architecture Diagram)
 
 ```mermaid

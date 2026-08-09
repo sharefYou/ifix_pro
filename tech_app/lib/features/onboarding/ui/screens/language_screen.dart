@@ -53,7 +53,7 @@ class _LanguageScreenState extends State<LanguageScreen>
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF0D1117), Color(0xFF0D1F3C)],
+                colors: [Color(0xFFEFF4FB), Color(0xFFF7F9FC)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),

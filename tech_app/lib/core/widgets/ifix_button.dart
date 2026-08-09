@@ -3,7 +3,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 import '../constants/app_text_styles.dart';
 
-class IFixButton extends StatelessWidget {
+class IFixButton extends StatefulWidget {
   final String label;
   final VoidCallback? onTap;
   final bool isLoading;
@@ -26,65 +26,86 @@ class IFixButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final effectiveColor = color ?? AppColors.accent;
+  State<IFixButton> createState() => _IFixButtonState();
+}
 
-    return AnimatedScale(
-      scale: onTap == null ? 0.97 : 1.0,
-      duration: AppConstants.animFast,
-      child: SizedBox(
-        width: width ?? double.infinity,
-        height: height,
-        child: isOutlined
-            ? OutlinedButton(
-                onPressed: isLoading ? null : onTap,
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: effectiveColor, width: 1.5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.radiusMD),
-                  ),
-                ),
-                child: _buildChild(effectiveColor),
-              )
-            : DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: onTap == null
-                      ? null
-                      : LinearGradient(
-                          colors: [effectiveColor, effectiveColor.withBlue(255)],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                  color: onTap == null ? AppColors.border : null,
-                  borderRadius: BorderRadius.circular(AppConstants.radiusMD),
-                  boxShadow: onTap == null
-                      ? null
-                      : [
-                          BoxShadow(
-                            color: effectiveColor.withValues(alpha: 0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                ),
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : onTap,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
+class _IFixButtonState extends State<IFixButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final effectiveColor = widget.color ?? AppColors.primary;
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTap: widget.isLoading ? null : widget.onTap,
+      child: AnimatedScale(
+        scale: (_pressed && widget.onTap != null) ? 0.96 : 1.0,
+        duration: AppConstants.animFast,
+        curve: Curves.easeOut,
+        child: AnimatedOpacity(
+          opacity: widget.onTap == null ? 0.5 : 1.0,
+          duration: AppConstants.animFast,
+          child: SizedBox(
+            width: widget.width ?? double.infinity,
+            height: widget.height,
+            child: widget.isOutlined
+                ? OutlinedButton(
+                    onPressed: widget.isLoading ? null : widget.onTap,
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: effectiveColor, width: 1.5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                      ),
+                    ),
+                    child: _buildChild(effectiveColor),
+                  )
+                : DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: widget.onTap == null
+                          ? null
+                          : LinearGradient(
+                              colors: [
+                                effectiveColor,
+                                Color.lerp(effectiveColor, Colors.blue.shade300, 0.25)!,
+                              ],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                      color: widget.onTap == null ? AppColors.border : null,
                       borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                      boxShadow: widget.onTap == null
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: effectiveColor.withValues(alpha: 0.25),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: widget.isLoading ? null : widget.onTap,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                        ),
+                      ),
+                      child: _buildChild(Colors.white),
                     ),
                   ),
-                  child: _buildChild(Colors.white),
-                ),
-              ),
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildChild(Color textColor) {
-    if (isLoading) {
+    if (widget.isLoading) {
       return SizedBox(
         width: 22,
         height: 22,
@@ -94,16 +115,16 @@ class IFixButton extends StatelessWidget {
         ),
       );
     }
-    if (icon != null) {
+    if (widget.icon != null) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          icon!,
+          widget.icon!,
           const SizedBox(width: 8),
-          Text(label, style: AppTextStyles.labelLarge.copyWith(color: textColor)),
+          Text(widget.label, style: AppTextStyles.labelLarge.copyWith(color: textColor, fontSize: 16)),
         ],
       );
     }
-    return Text(label, style: AppTextStyles.labelLarge.copyWith(color: textColor));
+    return Text(widget.label, style: AppTextStyles.labelLarge.copyWith(color: textColor, fontSize: 16));
   }
 }

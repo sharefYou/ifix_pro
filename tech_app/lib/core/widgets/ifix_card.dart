@@ -23,28 +23,32 @@ class IFixCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = borderRadius ?? AppConstants.radiusLG;
     return Material(
       color: Colors.transparent,
+      borderRadius: BorderRadius.circular(radius),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(borderRadius ?? AppConstants.radiusLG),
+        borderRadius: BorderRadius.circular(radius),
+        splashColor: AppColors.primary.withValues(alpha: 0.06),
+        highlightColor: AppColors.primary.withValues(alpha: 0.04),
         child: Ink(
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.surface, AppColors.surfaceVariant],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            color: color,
-            borderRadius: BorderRadius.circular(borderRadius ?? AppConstants.radiusLG),
+            color: color ?? AppColors.surface,
+            borderRadius: BorderRadius.circular(radius),
             border: showBorder
-                ? Border.all(color: AppColors.border, width: 0.5)
+                ? Border.all(color: AppColors.border, width: 0.8)
                 : null,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 8,
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 12,
                 offset: const Offset(0, 2),
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
               ),
             ],
           ),
@@ -75,7 +79,7 @@ class StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppConstants.radiusCircle),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
@@ -131,7 +135,7 @@ class SectionHeader extends StatelessWidget {
           TextButton(
             onPressed: onAction,
             child: Text(action!, style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.accent,
+              color: AppColors.primary,
             )),
           ),
       ],

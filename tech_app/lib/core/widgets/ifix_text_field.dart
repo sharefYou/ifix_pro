@@ -98,7 +98,7 @@ class IFixDropdown<T> extends StatelessWidget {
       initialValue: value,
       items: items,
       onChanged: onChanged,
-      dropdownColor: AppColors.surfaceVariant,
+      dropdownColor: AppColors.surface,
       style: AppTextStyles.bodyLarge,
       decoration: InputDecoration(
         hintText: hint,
@@ -113,7 +113,7 @@ class IFixDropdown<T> extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusMD),
-          borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
         filled: true,
         fillColor: AppColors.surfaceVariant,
